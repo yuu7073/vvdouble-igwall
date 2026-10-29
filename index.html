@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VV DOUBLE · IG 內容牆</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F4F5F7;color:#1F2430;font-family:"Noto Sans TC",system-ui,sans-serif;font-size:14px}
+a{color:#1F2430}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select{font:inherit;color:inherit}
+svg{width:16px;height:16px;flex:none}
+.top{height:56px;background:#fff;border-bottom:1px solid #E3E6EB;display:flex;align-items:center;padding:0 32px;gap:36px;position:sticky;top:0;z-index:10}
+.brand{font-size:17px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.tabs{display:flex;gap:28px;height:56px}
+.tab{padding:0 4px;height:56px;display:inline-flex;align-items:center;font-size:15px;color:#5A6170;border:0;background:none;border-bottom:2px solid transparent}
+.tab.on{color:#1F2430;font-weight:700;border-bottom-color:#1F2430}
+.right{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:#5A6170}
+.pw{height:34px;width:110px;border:1px solid #D4D7DE;border-radius:6px;padding:0 10px;background:#fff}
+.btn{height:36px;padding:0 16px;border-radius:6px;border:1px solid #D4D7DE;background:#fff;font-weight:500;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.p{background:#1F2430;color:#fff;border-color:#1F2430}
+.btn.sm{height:30px;padding:0 12px;font-size:13px}
+.wrap{padding:24px 32px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px;align-items:start}
+.card{background:#fff;border:1px solid #E3E6EB;border-radius:10px;padding:20px 24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.c7{grid-column:span 7}.c5{grid-column:span 5}.c4{grid-column:span 4}.c8{grid-column:span 8}.c12{grid-column:span 12}
+.h{display:flex;align-items:center;gap:12px}
+.h b{font-size:16px;font-weight:700;white-space:nowrap}
+.h .sub{font-size:13px;color:#5A6170}
+.h .end{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:#5A6170}
+.dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:#D4D7DE}
+.dot.g{background:#2E9E5B}.dot.r{background:#C8322B}.dot.y{background:#F3AB55}
+.grid{display:grid;gap:10px}
+.g6{grid-template-columns:repeat(6,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g8{grid-template-columns:repeat(8,minmax(0,1fr))}
+.th{position:relative;background:#E9EBEF;border-radius:6px;overflow:hidden;aspect-ratio:1;cursor:pointer;border:0;padding:0;width:100%}
+.th.v{aspect-ratio:9/16}.th.p{aspect-ratio:3/4}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th .num{position:absolute;left:6px;top:6px;background:#1F2430;color:#fff;font-size:11px;line-height:18px;min-width:18px;text-align:center;border-radius:9px;padding:0 5px}
+.th .vid{position:absolute;right:6px;top:6px;width:18px;height:18px;border-radius:9px;background:rgba(31,36,48,.75);display:flex;align-items:center;justify-content:center}
+.th .vid svg{width:10px;height:10px;fill:#fff}
+.th .x{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid #D4D7DE}
+.th .x svg{width:10px;height:10px}
+.th.on::after{content:"";position:absolute;inset:0;border:3px solid #F3AB55;border-radius:6px;pointer-events:none}
+.th .ck{position:absolute;right:6px;top:6px;width:20px;height:20px;border-radius:10px;background:#F3AB55;display:flex;align-items:center;justify-content:center}
+.th .ck svg{width:12px;height:12px}
+.th.drag{opacity:.4}
+.th .cap{position:absolute;left:0;right:0;bottom:0;padding:6px 8px;background:linear-gradient(transparent,rgba(31,36,48,.7));color:#fff;font-size:11px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{height:28px;padding:0 12px;border-radius:14px;border:1px solid #D4D7DE;font-size:13px;display:inline-flex;align-items:center;color:#5A6170;background:#fff}
+.chip.on{background:#1F2430;color:#fff;border-color:#1F2430}
+.foot{margin-top:auto;display:flex;align-items:center;gap:16px;padding-top:16px;border-top:1px solid #E3E6EB;font-size:13px;color:#5A6170;flex-wrap:wrap}
+.foot .end{margin-left:auto;display:flex;gap:10px}
+.step{display:inline-flex;align-items:center;border:1px solid #D4D7DE;border-radius:6px;height:32px;overflow:hidden}
+.step span{width:34px;text-align:center;font-weight:500;color:#1F2430}
+.step button{width:30px;height:32px;border:0;background:#F4F5F7;color:#5A6170;display:flex;align-items:center;justify-content:center;padding:0}
+.sep{width:1px;height:20px;background:#E3E6EB}
+.seg{display:inline-flex;border:1px solid #D4D7DE;border-radius:6px;overflow:hidden}
+.seg button{padding:0 14px;height:32px;border:0;background:#fff;font-size:13px;color:#5A6170;border-right:1px solid #D4D7DE}
+.seg button:last-child{border-right:0}
+.seg button.s{background:#1F2430;color:#fff}
+.row{display:flex;align-items:center;gap:16px}
+.row>b{width:72px;font-weight:500;color:#5A6170;flex:none}
+.sw{width:40px;height:22px;border-radius:11px;background:#D4D7DE;position:relative;border:0;padding:0;flex:none}
+.sw i{position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:8px;background:#fff;transition:left .15s}
+.sw.on{background:#2E9E5B}.sw.on i{left:21px}
+.inp{height:36px;border:1px solid #D4D7DE;border-radius:6px;padding:0 10px;background:#fff;width:100%}
+.search{display:flex;align-items:center;gap:8px;height:36px;border:1px solid #D4D7DE;border-radius:6px;padding:0 10px;color:#8A909C;background:#fff}
+.search input{border:0;outline:0;flex:1;background:transparent;min-width:0}
+.list{display:flex;flex-direction:column;gap:2px;max-height:620px;overflow:auto}
+.pr{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:8px;font-size:13px;cursor:pointer;border:0;background:none;text-align:left;width:100%}
+.pr:hover{background:#F8F9FA}.pr.s{background:#F4F5F7}
+.pr .im{width:40px;height:52px;border-radius:4px;flex:none;background:#E9EBEF;object-fit:cover}
+.pr .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.pr .k{color:#5A6170;font-size:12px}
+.more{text-align:center;font-size:13px;color:#5A6170;padding:8px;background:none;border:0;width:100%}
+.msg{font-size:13px;color:#5A6170;min-height:18px}
+.msg.err{color:#C8322B}.msg.ok{color:#2E9E5B}
+.empty{color:#8A909C;font-size:13px;padding:30px 0;text-align:center}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.kpi{background:#fff;border:1px solid #E3E6EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.kpi small{font-size:13px;color:#5A6170}.kpi strong{font-size:28px;font-weight:700;letter-spacing:-.5px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-weight:500;color:#5A6170;font-size:13px;padding:0 12px 10px;border-bottom:1px solid #E3E6EB}
+td{padding:8px 12px;border-bottom:1px solid #F0F1F4;vertical-align:middle}
+th.r,td.r{text-align:right}
+td img{width:40px;height:40px;border-radius:4px;object-fit:cover;display:block;background:#E9EBEF}
+.hide{display:none!important}
+.gate{max-width:420px;margin:80px auto;background:#fff;border:1px solid #E3E6EB;border-radius:10px;padding:28px;display:flex;flex-direction:column;gap:14px}
+.gate b{font-size:16px}
+@media(max-width:900px){.wrap{padding:16px;gap:16px}.c7,.c5,.c4,.c8{grid-column:span 12}.top{padding:0 16px;gap:16px}.tabs{gap:16px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">VV DOUBLE · IG 內容牆</div>
+  <div class="tabs">
+    <button class="tab on" data-tab="home">首頁牆</button>
+    <button class="tab" data-tab="float">浮動影片</button>
+    <button class="tab" data-tab="prod">商品頁</button>
+    <button class="tab" data-tab="stats">成效</button>
+  </div>
+  <div class="right">
+    <span id="syncInfo"></span>
+    <button class="btn" id="syncBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>立即同步</button>
+    <input class="pw" id="pw" type="password" placeholder="密碼" autocomplete="current-password">
+  </div>
+</div>
+
+<div id="gate" class="gate hide">
+  <b>連結 Instagram</b>
+  <div class="msg" id="gateMsg">用 FB 貼文工具的 Meta Token 讀取粉專連結的 Instagram 商業帳號。</div>
+  <button class="btn p" id="gateBtn">連結並同步貼文</button>
+</div>
+
+<!-- 首頁牆 -->
+<div class="wrap" id="tab-home">
+  <div class="card c7" style="min-height:720px">
+    <div class="h"><b>官網顯示中</b><span class="sub" id="homeCount">0 格 · 拖曳可換順序</span><span class="end"><span class="dot" id="homeDot"></span><span id="homeState">未發布</span></span></div>
+    <div class="grid g6" id="homeGrid"></div>
+    <div class="empty hide" id="homeEmpty">右邊點貼文加進來</div>
+    <div class="foot">
+      <span>桌機</span><span class="step"><button data-k="d" data-v="-1">−</button><span id="colD">6</span><button data-k="d" data-v="1">+</button></span><span>欄</span><span class="step"><button data-k="r" data-v="-1">−</button><span id="colR">3</span><button data-k="r" data-v="1">+</button></span><span>列</span>
+      <span class="sep"></span>
+      <span>手機</span><span class="step"><button data-k="m" data-v="-1">−</button><span id="colM">3</span><button data-k="m" data-v="1">+</button></span><span>欄</span><span class="step"><button data-k="mr" data-v="-1">−</button><span id="colMR">4</span><button data-k="mr" data-v="1">+</button></span><span>列</span>
+      <span class="sep"></span>
+      <span>標題</span><input class="inp" id="homeTitle" style="width:150px;height:32px" value="FOLLOW US">
+      <span class="end"><span class="msg" id="homeMsg"></span><button class="btn p" id="homePub">發布到官網</button></span>
+    </div>
+  </div>
+  <div class="card c5" style="min-height:720px">
+    <div class="h"><b>IG 貼文</b><span class="sub" id="igHandle"></span></div>
+    <div class="chips" id="homeFilters"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="video">影片</button><button class="chip" data-f="album">多圖</button><button class="chip" data-f="unused">未使用</button></div>
+    <div class="grid g4" id="homePick"></div>
+    <button class="more" id="homeMore">載入更多</button>
+  </div>
+</div>
+
+<!-- 浮動影片 -->
+<div class="wrap hide" id="tab-float">
+  <div class="card c5" style="min-height:560px">
+    <div class="h"><b>目前顯示</b><span class="end"><span class="dot" id="floatDot"></span><span id="floatState">未發布</span></span></div>
+    <div style="display:flex;gap:20px" id="floatCur"><div class="empty" style="flex:1">右邊點一支影片</div></div>
+    <div style="display:flex;flex-direction:column;gap:14px;padding-top:16px;border-top:1px solid #E3E6EB">
+      <div class="row"><b>顯示</b><button class="sw" id="floatOn"><i></i></button></div>
+      <div class="row"><b>位置</b><span class="seg" id="floatPos"><button data-v="bl">左下</button><button data-v="br" class="s">右下</button></span></div>
+      <div class="row"><b>大小</b><span class="seg" id="floatSize"><button data-v="s">小</button><button data-v="m" class="s">中</button><button data-v="l">大</button></span></div>
+      <div class="row"><b>自動播放</b><button class="sw" id="floatAuto"><i></i></button></div>
+      <div class="row"><b>顯示頁面</b><span class="seg" id="floatPages"><button data-v="all" class="s">全站</button><button data-v="home">只有首頁</button></span></div>
+    </div>
+    <div class="foot" style="border-top:0;padding-top:0"><span class="msg" id="floatMsg"></span><span class="end"><button class="btn p" id="floatPub">發布到官網</button></span></div>
+  </div>
+  <div class="card c7" style="min-height:560px">
+    <div class="h"><b>IG 影片</b><span class="sub">只列 Reels · 點一下換成這支</span></div>
+    <div class="grid g6" id="floatPick"></div>
+    <button class="more" id="floatMore">載入更多</button>
+  </div>
+</div>
+
+<!-- 商品頁 -->
+<div class="wrap hide" id="tab-prod">
+  <div class="card c4" style="min-height:760px">
+    <div class="h"><b>商品</b><span class="sub">Shopline</span></div>
+    <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="prodQ" placeholder="品名或貨號"></label>
+    <div class="chips" id="prodFilters"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="set">已設定 <span id="prodSetN">0</span></button></div>
+    <div class="list" id="prodList"></div>
+    <button class="more" id="prodMore">載入更多</button>
+  </div>
+  <div class="card c8" style="min-height:760px" id="prodPanel">
+    <div class="empty" id="prodEmpty">左邊選一個商品</div>
+    <div id="prodBody" class="hide" style="display:flex;flex-direction:column;gap:16px;flex:1">
+      <div class="h"><b id="pTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%"></b><a id="pLink" href="#" target="_blank" rel="noopener" style="font-size:13px;color:#5A6170;white-space:nowrap">開啟商品頁</a><span class="end"><span class="dot" id="pDot"></span><span id="pState">未設定</span></span></div>
+      <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="msg">商品頁顯示中</div>
+          <div style="display:flex;gap:10px" id="pItems"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding-left:20px;border-left:1px solid #E3E6EB;font-size:13px">
+          <div class="row"><b style="width:56px">位置</b><span class="seg" id="pPos"><button data-v="cart" class="s">加入購物車下方</button><button data-v="desc">商品說明上方</button><button data-v="float">右下浮窗</button></span></div>
+          <div class="row"><b style="width:56px">同色款</b><span class="seg" id="pSib"><button data-v="all" class="s">一起套用</button><button data-v="one">只有這款</button></span><span class="msg" id="pSibInfo"></span></div>
+        </div>
+      </div>
+      <div class="h" style="padding-top:14px;border-top:1px solid #E3E6EB"><b style="font-size:14px">IG 貼文</b><span class="sub">點一下加入 · 最多 3 支</span><span class="end chips" id="pFilters"><button class="chip on" data-f="suggest">建議</button><button class="chip" data-f="video">影片</button><button class="chip" data-f="all">全部</button></span></div>
+      <div class="grid g8" id="pPick"></div>
+      <button class="more" id="pMore">載入更多</button>
+      <div class="foot" style="border-top:0;padding-top:0"><span class="msg" id="pMsg"></span><span class="end"><button class="btn" id="pRemove">移除商品頁影片</button><button class="btn p" id="pPub">發布到官網</button></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 成效 -->
+<div class="wrap hide" id="tab-stats">
+  <div class="c12" style="display:flex;align-items:center;gap:12px"><span class="seg" id="statRange"><button data-v="7">7 天</button><button data-v="30" class="s">30 天</button><button data-v="90">90 天</button></span><span class="msg">點擊次數由前台回報；GA 報表之後再接</span></div>
+  <div class="c12 kpis" id="kpis"></div>
+  <div class="card c12"><div class="h"><b>各貼文</b><span class="end chips" id="statCtx"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="home">首頁牆</button><button class="chip" data-f="float">浮窗</button><button class="chip" data-f="product">商品頁</button></span></div>
+    <table><thead><tr><th style="width:56px"></th><th>貼文</th><th>類型</th><th class="r">點開</th><th class="r">播放</th><th class="r">點 IG 連結</th></tr></thead><tbody id="statRows"></tbody></table>
+  </div>
+</div>
+
+<script>
+var FN_URL = 'https://asia-east1-vvdouble-shopline.cloudfunctions.net/igwall';
+var $ = function(s){ return document.querySelector(s); };
+var $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+var ICON_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+var ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="#1F2430" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+var ICON_CK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>';
+var S = { status:null, media:[], mediaById:{}, home:{ on:true, title:'FOLLOW US', items:[], cols:{d:6,r:3,m:3,mr:4} }, float:{ on:false, mediaId:'', pos:'br', size:'m', autoplay:false, pages:'all' }, products:{},
+  homeF:'all', homeN:60, floatN:60, prodF:'all', prodQ:'', prodPage:1, prodItems:[], prodSel:null, pItems:[], pPos:'cart', pSib:'all', pF:'suggest', pN:48, sibs:[], statDays:30, statCtx:'all', stats:null };
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function say(el, t, cls){ el.textContent = t || ''; el.className = 'msg ' + (cls || ''); }
+function fmt(ts){ if(!ts) return ''; var d = new Date(ts); return (d.getMonth()+1) + '/' + d.getDate() + ' ' + ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2); }
+async function api(action, data){
+  var r = await fetch(FN_URL, { method:'POST', headers:{ 'Content-Type':'application/json', 'X-Tool-Password': $('#pw').value }, body: JSON.stringify(Object.assign({ action: action }, data || {})) });
+  var j = await r.json().catch(function(){ return {}; });
+  if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status));
+  return j;
+}
+function segBind(id, get, set){ $$('#'+id+' button').forEach(function(b){ b.addEventListener('click', function(){ set(b.dataset.v); segPaint(id, get()); }); }); segPaint(id, get()); }
+function segPaint(id, v){ $$('#'+id+' button').forEach(function(b){ b.classList.toggle('s', b.dataset.v === String(v)); }); }
+function chipBind(id, set){ $$('#'+id+' .chip').forEach(function(b){ b.addEventListener('click', function(){ $$('#'+id+' .chip').forEach(function(x){ x.classList.remove('on'); }); b.classList.add('on'); set(b.dataset.f); }); }); }
+function swBind(id, get, set){ var b = $('#'+id); b.classList.toggle('on', !!get()); b.addEventListener('click', function(){ set(!get()); b.classList.toggle('on', !!get()); }); }
+function swPaint(id, v){ $('#'+id).classList.toggle('on', !!v); }
+function thumb(m, opts){
+  opts = opts || {};
+  var b = document.createElement('button'); b.type = 'button'; b.className = 'th' + (opts.cls ? ' ' + opts.cls : '') + (opts.on ? ' on' : '');
+  b.innerHTML = '<img loading="lazy" src="' + esc(m.thumb) + '" alt="">' + (opts.num ? '<span class="num">' + opts.num + '</span>' : '') + (m.type === 'VIDEO' && !opts.on ? '<span class="vid">' + ICON_PLAY + '</span>' : '') + (opts.on ? '<span class="ck">' + ICON_CK + '</span>' : '') + (opts.x ? '<span class="x">' + ICON_X + '</span>' : '') + (opts.cap ? '<span class="cap">' + esc((m.caption || '').split('\n')[0]) + '</span>' : '');
+  b.title = (m.caption || '').slice(0, 120);
+  return b;
+}
+function typeName(t){ return t === 'VIDEO' ? '影片' : (t === 'CAROUSEL_ALBUM' ? '多圖' : '圖片'); }
+
+// ---------- 載入 ----------
+async function loadStatus(){
+  try {
+    var st = await api('status'); S.status = st;
+    $('#syncInfo').textContent = st.sync ? ('上次同步 ' + fmt(st.sync.at) + (st.sync.ok ? '' : ' 失敗')) : '尚未同步';
+    $('#syncInfo').style.color = st.sync && !st.sync.ok ? '#C8322B' : '';
+    $('#igHandle').textContent = st.ig.username ? '@' + st.ig.username + ' · 點一下加入' : '';
+    if (!st.ig.userId || !st.mediaCount) { $('#gate').classList.remove('hide'); $$('.wrap').forEach(function(w){ w.classList.add('hide'); }); if (!st.meta) say($('#gateMsg'), '尚未設定 Meta：請先在 FB 貼文工具換好 Token', 'err'); return; }
+    $('#gate').classList.add('hide'); showTab(S.tab || 'home');
+    var c = st.config || {};
+    if (c.home && c.home.items) S.home = Object.assign({ on:true, title:'FOLLOW US', items:[], cols:{d:6,r:3,m:3,mr:4} }, c.home);
+    if (c.float) S.float = Object.assign(S.float, c.float);
+    S.products = c.products || {};
+    S.pubHome = st.publishedAt.home; S.pubFloat = st.publishedAt.float;
+    var md = await api('media'); S.media = md.items || []; S.mediaById = {}; S.media.forEach(function(m){ S.mediaById[m.id] = m; });
+    paintAll();
+  } catch (e) { $('#syncInfo').textContent = e.message; $('#syncInfo').style.color = '#C8322B'; }
+}
+function paintAll(){ paintHome(); paintFloat(); paintProdPanel(); $('#prodSetN').textContent = Object.keys(S.products).length; }
+
+// ---------- 首頁牆 ----------
+function paintHome(){
+  var g = $('#homeGrid'); g.innerHTML = '';
+  var items = S.home.items.map(function(id){ return S.mediaById[id]; }).filter(Boolean);
+  S.home.items = items.map(function(m){ return m.id; });
+  $('#homeCount').textContent = items.length + ' 格 · 拖曳可換順序';
+  $('#homeEmpty').classList.toggle('hide', items.length > 0);
+  items.forEach(function(m, i){
+    var b = thumb(m, { num: i + 1, x: true }); b.draggable = true; b.dataset.id = m.id;
+    b.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); S.home.items.splice(i, 1); paintHome(); paintHomePick(); });
+    b.addEventListener('dragstart', function(e){ S.dragId = m.id; b.classList.add('drag'); e.dataTransfer.effectAllowed = 'move'; });
+    b.addEventListener('dragend', function(){ b.classList.remove('drag'); });
+    b.addEventListener('dragover', function(e){ e.preventDefault(); });
+    b.addEventListener('drop', function(e){ e.preventDefault(); var from = S.home.items.indexOf(S.dragId); var to = i; if (from < 0 || from === to) return; var id = S.home.items.splice(from, 1)[0]; S.home.items.splice(to, 0, id); paintHome(); });
+    g.appendChild(b);
+  });
+  var c = S.home.cols; $('#colD').textContent = c.d; $('#colR').textContent = c.r; $('#colM').textContent = c.m; $('#colMR').textContent = c.mr;
+  g.className = 'grid g' + Math.min(8, Math.max(2, c.d)); g.style.gridTemplateColumns = 'repeat(' + c.d + ',minmax(0,1fr))';
+  $('#homeTitle').value = S.home.title == null ? '' : S.home.title;
+  var need = c.d * c.r;
+  var dirty = S.home.updatedAt && S.pubHome && S.home.updatedAt > S.pubHome;
+  $('#homeDot').className = 'dot ' + (S.pubHome ? (dirty ? 'y' : 'g') : '');
+  $('#homeState').textContent = S.pubHome ? (dirty ? '有未發布的修改' : '已發布 ' + fmt(S.pubHome)) : '未發布';
+  if (items.length < need) $('#homeCount').textContent += ' · 桌機要 ' + need + ' 格';
+  paintHomePick();
+}
+function filtered(f){
+  return S.media.filter(function(m){
+    if (f === 'video') return m.type === 'VIDEO';
+    if (f === 'album') return m.type === 'CAROUSEL_ALBUM';
+    if (f === 'unused') return S.home.items.indexOf(m.id) < 0;
+    return true;
+  });
+}
+function paintHomePick(){
+  var g = $('#homePick'); g.innerHTML = '';
+  var list = filtered(S.homeF);
+  list.slice(0, S.homeN).forEach(function(m){
+    var on = S.home.items.indexOf(m.id) >= 0;
+    var b = thumb(m, { on: on });
+    b.addEventListener('click', function(){ var i = S.home.items.indexOf(m.id); if (i >= 0) S.home.items.splice(i, 1); else S.home.items.push(m.id); paintHome(); });
+    g.appendChild(b);
+  });
+  $('#homeMore').classList.toggle('hide', list.length <= S.homeN);
+}
+$$('#tab-home .step button').forEach(function(b){ b.addEventListener('click', function(){ var k = b.dataset.k, v = Number(b.dataset.v); var lim = { d:[2,8], r:[1,6], m:[1,4], mr:[1,8] }[k]; S.home.cols[k] = Math.min(lim[1], Math.max(lim[0], S.home.cols[k] + v)); paintHome(); }); });
+chipBind('homeFilters', function(f){ S.homeF = f; S.homeN = 60; paintHomePick(); });
+$('#homeMore').addEventListener('click', function(){ S.homeN += 60; paintHomePick(); });
+$('#homeTitle').addEventListener('input', function(){ S.home.title = $('#homeTitle').value; });
+$('#homePub').addEventListener('click', async function(){
+  var btn = $('#homePub'); btn.disabled = true; say($('#homeMsg'), '發布中…');
+  try { await api('saveHome', { home: S.home }); await api('publish'); say($('#homeMsg'), '已發布', 'ok'); await loadStatus(); }
+  catch (e) { say($('#homeMsg'), e.message, 'err'); }
+  btn.disabled = false;
+});
+
+// ---------- 浮動影片 ----------
+function paintFloat(){
+  var m = S.mediaById[S.float.mediaId];
+  var cur = $('#floatCur'); cur.innerHTML = '';
+  if (m) {
+    var t = thumb(m, { cls:'v' }); t.style.width = '150px'; t.style.flex = 'none'; cur.appendChild(t);
+    var info = document.createElement('div'); info.style.cssText = 'display:flex;flex-direction:column;gap:8px;font-size:13px;color:#5A6170;line-height:1.6;min-width:0';
+    var d = m.ts ? new Date(m.ts) : null;
+    info.innerHTML = '<div style="font-size:14px;color:#1F2430;font-weight:500;white-space:pre-wrap;max-height:3.2em;overflow:hidden">' + esc((m.caption || '').split('\n').slice(0,2).join('\n')) + '</div><div>' + (d ? d.getFullYear() + '/' + ('0'+(d.getMonth()+1)).slice(-2) + '/' + ('0'+d.getDate()).slice(-2) : '') + ' · ' + typeName(m.type) + '</div><div>按讚 ' + (m.likes||0).toLocaleString() + ' · 留言 ' + (m.comments||0) + '</div>' + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" rel="noopener" style="font-size:13px">在 Instagram 查看</a>' : '');
+    cur.appendChild(info);
+  } else cur.innerHTML = '<div class="empty" style="flex:1">右邊點一支影片</div>';
+  swPaint('floatOn', S.float.on); swPaint('floatAuto', S.float.autoplay);
+  segPaint('floatPos', S.float.pos); segPaint('floatSize', S.float.size); segPaint('floatPages', S.float.pages);
+  var dirty = S.float.updatedAt && S.pubFloat && S.float.updatedAt > S.pubFloat;
+  $('#floatDot').className = 'dot ' + (S.pubFloat ? (S.float.on && m ? (dirty ? 'y' : 'g') : '') : '');
+  $('#floatState').textContent = S.pubFloat ? (S.float.on && m ? (dirty ? '有未發布的修改' : '已發布 ' + fmt(S.pubFloat)) : '已關閉') : '未發布';
+  paintFloatPick();
+}
+function paintFloatPick(){
+  var g = $('#floatPick'); g.innerHTML = '';
+  var list = S.media.filter(function(m){ return m.type === 'VIDEO'; });
+  list.slice(0, S.floatN).forEach(function(m){
+    var b = thumb(m, { cls:'v', on: m.id === S.float.mediaId, cap:true });
+    b.addEventListener('click', function(){ S.float.mediaId = m.id; S.float.on = true; paintFloat(); });
+    g.appendChild(b);
+  });
+  $('#floatMore').classList.toggle('hide', list.length <= S.floatN);
+}
+swBind('floatOn', function(){ return S.float.on; }, function(v){ S.float.on = v; paintFloat(); });
+swBind('floatAuto', function(){ return S.float.autoplay; }, function(v){ S.float.autoplay = v; });
+segBind('floatPos', function(){ return S.float.pos; }, function(v){ S.float.pos = v; });
+segBind('floatSize', function(){ return S.float.size; }, function(v){ S.float.size = v; });
+segBind('floatPages', function(){ return S.float.pages; }, function(v){ S.float.pages = v; });
+$('#floatMore').addEventListener('click', function(){ S.floatN += 60; paintFloatPick(); });
+$('#floatPub').addEventListener('click', async function(){
+  var btn = $('#floatPub'); btn.disabled = true; say($('#floatMsg'), '發布中…');
+  try { await api('saveFloat', { float: S.float }); await api('publish'); say($('#floatMsg'), '已發布', 'ok'); await loadStatus(); }
+  catch (e) { say($('#floatMsg'), e.message, 'err'); }
+  btn.disabled = false;
+});
+
+// ---------- 商品頁 ----------
+var prodTimer = null;
+async function loadProducts(reset){
+  if (reset) { S.prodPage = 1; S.prodItems = []; }
+  $('#prodList').innerHTML = '<div class="empty">載入中…</div>';
+  try {
+    var r = await api('shoplineSearch', { query: S.prodQ, page: S.prodPage });
+    S.prodItems = S.prodItems.concat(r.items || []);
+    $('#prodMore').classList.toggle('hide', !!S.prodQ || (r.items || []).length < 40);
+  } catch (e) { $('#prodList').innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+  paintProdList();
+}
+function paintProdList(){
+  var l = $('#prodList'); l.innerHTML = '';
+  var list = S.prodItems.filter(function(p){ return S.prodF === 'set' ? !!S.products[p.id] : true; });
+  if (S.prodF === 'set' && !S.prodQ) {
+    // 已設定但不在目前清單的，也列出來
+    Object.keys(S.products).forEach(function(id){ if (!S.prodItems.some(function(p){ return p.id === id; })) list.push({ id:id, title: S.products[id].title || id, sku: S.products[id].sku || '', image:'' }); });
+  }
+  if (!list.length) { l.innerHTML = '<div class="empty">沒有商品</div>'; return; }
+  list.forEach(function(p){
+    var b = document.createElement('button'); b.className = 'pr' + (S.prodSel && S.prodSel.id === p.id ? ' s' : '');
+    b.innerHTML = '<span class="dot ' + (S.products[p.id] ? 'g' : '') + '"></span>' + (p.image ? '<img class="im" src="' + esc(p.image) + '" alt="">' : '<span class="im"></span>') + '<span class="n">' + esc(p.title) + '<br><span class="k">' + esc(p.sku) + (p.status && p.status !== 'active' ? ' · ' + esc(p.status) : '') + '</span></span>';
+    b.addEventListener('click', function(){ selectProduct(p); });
+    l.appendChild(b);
+  });
+}
+async function selectProduct(p){
+  S.prodSel = p; paintProdList();
+  var cfg = S.products[p.id] || {};
+  S.pItems = (cfg.items || []).slice(); S.pPos = cfg.pos || 'cart'; S.pF = 'suggest'; S.pN = 48;
+  $$('#pFilters .chip').forEach(function(x){ x.classList.toggle('on', x.dataset.f === 'suggest'); });
+  S.sibs = [];
+  paintProdPanel();
+  // 同色款：貨號前 8 碼相同的其他商品
+  var pre = (p.sku || '').slice(0, 8);
+  if (pre.length >= 6) {
+    try { var r = await api('shoplineSearch', { query: pre }); S.sibs = (r.items || []).filter(function(x){ return x.id !== p.id && (x.sku || '').toUpperCase().slice(0, 8) === pre.toUpperCase(); }); } catch (e) {}
+    if (S.prodSel === p) paintSib();
+  }
+}
+function paintSib(){ $('#pSibInfo').textContent = S.sibs.length ? ('另有 ' + S.sibs.length + ' 款同貨號') : '沒有其他同色款'; }
+function skuCore(p){ return (p.sku || '').slice(0, 8).toUpperCase(); }
+function titleCore(p){ return (p.title || '').replace(/《[^》]*》/g, '').replace(/[\s★☆|｜]/g, '').trim(); }
+function suggest(p){
+  var sku = skuCore(p), tc = titleCore(p), tc6 = tc.slice(0, 6);
+  return S.media.filter(function(m){ var c = (m.caption || '').toUpperCase(); return (sku && c.indexOf(sku) >= 0) || (tc && m.caption.indexOf(tc) >= 0) || (tc6.length >= 4 && m.caption.indexOf(tc6) >= 0); });
+}
+function paintProdPanel(){
+  var p = S.prodSel;
+  $('#prodEmpty').classList.toggle('hide', !!p); $('#prodBody').classList.toggle('hide', !p);
+  if (!p) return;
+  $('#pTitle').textContent = p.title; $('#pLink').href = 'https://www.vvdouble.com/products/' + p.id;
+  var set = S.products[p.id];
+  $('#pDot').className = 'dot ' + (set ? 'g' : ''); $('#pState').textContent = set ? '已發布 ' + fmt(set.updatedAt) : '未設定';
+  var box = $('#pItems'); box.innerHTML = '';
+  S.pItems = S.pItems.filter(function(id){ return S.mediaById[id]; }).slice(0, 3);
+  S.pItems.forEach(function(id, i){
+    var b = thumb(S.mediaById[id], { cls:'p', num: i + 1, x: true }); b.style.width = '96px';
+    b.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); S.pItems.splice(i, 1); paintProdPanel(); });
+    box.appendChild(b);
+  });
+  for (var k = S.pItems.length; k < 3; k++) { var e = document.createElement('div'); e.style.cssText = 'width:96px;aspect-ratio:3/4;border:1px dashed #D4D7DE;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8A909C'; e.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M12 5v14M5 12h14"/></svg>'; box.appendChild(e); }
+  segPaint('pPos', S.pPos); segPaint('pSib', S.pSib); paintSib();
+  var g = $('#pPick'); g.innerHTML = '';
+  var list = S.pF === 'suggest' ? suggest(p) : (S.pF === 'video' ? S.media.filter(function(m){ return m.type === 'VIDEO'; }) : S.media);
+  if (S.pF === 'suggest' && !list.length) g.innerHTML = '<div class="empty" style="grid-column:1/-1">沒有提到這個商品的貼文，切到「影片」或「全部」挑</div>';
+  list.slice(0, S.pN).forEach(function(m){
+    var on = S.pItems.indexOf(m.id) >= 0;
+    var b = thumb(m, { cls:'p', on:on, cap:true });
+    b.addEventListener('click', function(){ var i = S.pItems.indexOf(m.id); if (i >= 0) S.pItems.splice(i, 1); else { if (S.pItems.length >= 3) { say($('#pMsg'), '最多 3 支，先移除一支', 'err'); return; } S.pItems.push(m.id); } say($('#pMsg'), ''); paintProdPanel(); });
+    g.appendChild(b);
+  });
+  $('#pMore').classList.toggle('hide', list.length <= S.pN);
+}
+$('#prodQ').addEventListener('input', function(){ clearTimeout(prodTimer); prodTimer = setTimeout(function(){ S.prodQ = $('#prodQ').value.trim(); loadProducts(true); }, 400); });
+chipBind('prodFilters', function(f){ S.prodF = f; paintProdList(); });
+chipBind('pFilters', function(f){ S.pF = f; S.pN = 48; paintProdPanel(); });
+segBind('pPos', function(){ return S.pPos; }, function(v){ S.pPos = v; });
+segBind('pSib', function(){ return S.pSib; }, function(v){ S.pSib = v; });
+$('#prodMore').addEventListener('click', function(){ S.prodPage++; loadProducts(false); });
+$('#pMore').addEventListener('click', function(){ S.pN += 48; paintProdPanel(); });
+async function saveProd(items){
+  var p = S.prodSel; if (!p) return;
+  var ids = [p.id].concat(S.pSib === 'all' ? S.sibs.map(function(x){ return x.id; }) : []);
+  $('#pPub').disabled = $('#pRemove').disabled = true; say($('#pMsg'), '發布中…');
+  try { await api('saveProduct', { ids: ids, items: items, pos: S.pPos, title: p.title, sku: p.sku }); await api('publish'); say($('#pMsg'), items.length ? '已發布（' + ids.length + ' 款）' : '已移除（' + ids.length + ' 款）', 'ok'); var st = await api('status'); S.products = (st.config || {}).products || {}; $('#prodSetN').textContent = Object.keys(S.products).length; if (!items.length) S.pItems = []; paintProdList(); paintProdPanel(); }
+  catch (e) { say($('#pMsg'), e.message, 'err'); }
+  $('#pPub').disabled = $('#pRemove').disabled = false;
+}
+$('#pPub').addEventListener('click', function(){ if (!S.pItems.length) { say($('#pMsg'), '先選影片', 'err'); return; } saveProd(S.pItems); });
+$('#pRemove').addEventListener('click', function(){ saveProd([]); });
+
+// ---------- 成效 ----------
+async function loadStats(){
+  try { S.stats = await api('stats'); } catch (e) { $('#kpis').innerHTML = '<div class="msg err">' + esc(e.message) + '</div>'; return; }
+  paintStats();
+}
+function paintStats(){
+  if (!S.stats) return;
+  var day = S.stats.day || {}, media = S.stats.media || {};
+  var since = Date.now() - S.statDays * 86400e3;
+  var sum = {};
+  Object.keys(day).forEach(function(d){ if (Date.parse(d) >= since) Object.keys(day[d]).forEach(function(k){ sum[k] = (sum[k] || 0) + day[d][k]; }); });
+  var kp = [['點開貼文', sum.open], ['影片播放', sum.play], ['點 IG 連結', sum.link], ['浮窗點開', sum.float_open], ['商品頁點開', sum.product_open]];
+  $('#kpis').innerHTML = kp.map(function(k){ return '<div class="kpi"><small>' + k[0] + '</small><strong>' + (k[1] || 0).toLocaleString() + '</strong></div>'; }).join('');
+  var rows = Object.keys(media).map(function(id){ var s = media[id]; var pre = S.statCtx === 'all' ? '' : S.statCtx + '_'; return { id:id, m:S.mediaById[id], open: s[pre+'open']||0, play: s[pre+'play']||0, link: s[pre+'link']||0 }; }).filter(function(r){ return r.open || r.play || r.link; }).sort(function(a,b){ return b.open - a.open; });
+  $('#statRows').innerHTML = rows.length ? rows.map(function(r){ var m = r.m || {}; return '<tr><td>' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="">' : '') + '</td><td>' + esc((m.caption || r.id).split('\n')[0].slice(0, 40)) + '</td><td>' + (m.type ? typeName(m.type) : '') + '</td><td class="r">' + r.open + '</td><td class="r">' + r.play + '</td><td class="r">' + r.link + '</td></tr>'; }).join('') : '<tr><td colspan="6" class="empty">還沒有資料（累計總數，不分天）</td></tr>';
+}
+segBind('statRange', function(){ return S.statDays; }, function(v){ S.statDays = Number(v); paintStats(); });
+chipBind('statCtx', function(f){ S.statCtx = f; paintStats(); });
+
+// ---------- 共用 ----------
+function showTab(t){ S.tab = t; $$('.tab').forEach(function(b){ b.classList.toggle('on', b.dataset.tab === t); }); $$('.wrap').forEach(function(w){ w.classList.toggle('hide', w.id !== 'tab-' + t); }); if (t === 'prod' && !S.prodItems.length) loadProducts(true); if (t === 'stats') loadStats(); }
+$$('.tab').forEach(function(b){ b.addEventListener('click', function(){ if ($('#gate').classList.contains('hide')) showTab(b.dataset.tab); }); });
+$('#pw').value = sessionStorage.getItem('fbpost_pw') || '';
+$('#pw').addEventListener('change', function(){ sessionStorage.setItem('fbpost_pw', $('#pw').value); loadStatus(); });
+$('#syncBtn').addEventListener('click', async function(){ var b = $('#syncBtn'); b.disabled = true; $('#syncInfo').textContent = '同步中…'; try { var r = await api('sync'); $('#syncInfo').textContent = '已同步 ' + r.count + ' 則'; await loadStatus(); } catch (e) { $('#syncInfo').textContent = e.message; $('#syncInfo').style.color = '#C8322B'; } b.disabled = false; });
+$('#gateBtn').addEventListener('click', async function(){ var b = $('#gateBtn'); b.disabled = true; say($('#gateMsg'), '連結中…'); try { var r = await api('igConnect'); say($('#gateMsg'), '已連結 @' + r.ig.username + '，同步 ' + r.count + ' 則', 'ok'); await loadStatus(); } catch (e) { say($('#gateMsg'), e.message, 'err'); } b.disabled = false; });
+loadStatus();
+</script>
+</body>
+</html>
