@@ -238,7 +238,9 @@ async function loadStatus(){
     $('#syncInfo').textContent = st.sync ? ('上次同步 ' + fmt(st.sync.at) + (st.sync.ok ? '' : ' 失敗')) : '尚未同步';
     $('#syncInfo').style.color = st.sync && !st.sync.ok ? '#C8322B' : '';
     $('#igHandle').textContent = st.ig.username ? '@' + st.ig.username + ' · 點一下加入' : '';
+    $('#gate b').textContent = '連結 Instagram'; $('#gateBtn').classList.remove('hide');
     if (!st.ig.userId || !st.mediaCount) { $('#gate').classList.remove('hide'); $$('.wrap').forEach(function(w){ w.classList.add('hide'); }); if (!st.meta) say($('#gateMsg'), '尚未設定 Meta：請先在 FB 貼文工具換好 Token', 'err'); return; }
+    $('#gate b').textContent = '連結 Instagram'; $('#gateBtn').classList.remove('hide');
     $('#gate').classList.add('hide'); showTab(S.tab || 'home');
     var c = st.config || {};
     if (c.home && c.home.items) S.home = Object.assign({ on:true, title:'FOLLOW US', items:[], cols:{d:6,r:3,m:3,mr:4} }, c.home);
@@ -247,7 +249,10 @@ async function loadStatus(){
     S.pubHome = st.publishedAt.home; S.pubFloat = st.publishedAt.float;
     var md = await api('media'); S.media = md.items || []; S.mediaById = {}; S.media.forEach(function(m){ S.mediaById[m.id] = m; });
     paintAll();
-  } catch (e) { $('#syncInfo').textContent = e.message; $('#syncInfo').style.color = '#C8322B'; }
+  } catch (e) {
+    $('#syncInfo').textContent = e.message; $('#syncInfo').style.color = '#C8322B';
+    if (/密碼/.test(e.message)) { $('#gate').classList.remove('hide'); $$('.wrap').forEach(function(w){ w.classList.add('hide'); }); $('#gate b').textContent = '輸入密碼'; say($('#gateMsg'), '右上角輸入密碼（與 FB 貼文工具同一組）後按 Enter'); $('#gateBtn').classList.add('hide'); $('#pw').focus(); }
+  }
 }
 function paintAll(){ paintHome(); paintFloat(); paintProdPanel(); $('#prodSetN').textContent = Object.keys(S.products).length; }
 
