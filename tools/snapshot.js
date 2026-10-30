@@ -17,7 +17,7 @@ const [,, url, out, kind] = process.argv;
   const cfg = kind === "product"
     ? `window.mainConfig={pageType:"products-show",trackerEventData:{"Product ID":"__PID__"}};`
     : `window.mainConfig={pageType:"home"};`;
-  const inject = `<base href="https://www.vvdouble.com/">\n<style>[ng-cloak]{display:block!important}.vvig-preview-bar{position:fixed;left:0;right:0;top:0;z-index:2147483647;height:32px;background:#1F2430;color:#fff;font:12px/32px system-ui,sans-serif;padding:0 14px;letter-spacing:.5px}body{padding-top:32px!important}</style>`;
+  const inject = `<meta charset="utf-8">\n<base href="https://www.vvdouble.com/">\n<style>[ng-cloak]{display:block!important}.vvig-preview-bar{position:fixed;left:0;right:0;top:0;z-index:2147483647;height:32px;background:#1F2430;color:#fff;font:12px/32px system-ui,sans-serif;padding:0 14px;letter-spacing:.5px}body{padding-top:32px!important}</style>`;
   html = html.replace(/<head([^>]*)>/i, `<head$1>\n${inject}`);
   const bar = `<div class="vvig-preview-bar">預覽模式 · 官網快照 · 這不是正式網站</div>\n<script>${cfg}</script>\n<script defer src="https://yuu7073.github.io/vvdouble-igwall/embed.js"></script>`;
   html = html.replace(/<body([^>]*)>/i, `<body$1>\n${bar}`);
