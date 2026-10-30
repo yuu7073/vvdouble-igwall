@@ -14,10 +14,22 @@
   function mc() { return window.mainConfig || {}; }
   function isHome() { var p = location.pathname.replace(/\/+$/, ""); return p === "" || p === "/" || /^\/[a-z]{2}(-[A-Za-z]{2,4})?$/.test(p) || mc().pageType === "home"; }
   function productId() { var t = mc().trackerEventData || {}; return t["Product ID"] || t.product_id || ""; }
+  var curPid = "";
   function track(ev, ctx, m) {
-    try { (window.dataLayer = window.dataLayer || []).push({ event: "ig_wall_" + ev, ig_ctx: ctx, ig_media: m.id, ig_type: m.type }); } catch (e) {}
-    try { fetch(FN, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "track", ev: ev, ctx: ctx, mediaId: m.id }), keepalive: true }).catch(function () {}); } catch (e) {}
+    try { (window.dataLayer = window.dataLayer || []).push({ event: "ig_wall_" + ev, ig_ctx: ctx, ig_media: m.id, ig_type: m.type, ig_product: curPid || undefined }); } catch (e) {}
+    try { fetch(FN, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "track", ev: ev, ctx: ctx, mediaId: m.id, pid: ctx === "product" ? curPid : "" }), keepalive: true }).catch(function () {}); } catch (e) {}
   }
+  // 停留時間：從牆進到畫面開始算，離開頁面時送一次
+  var dwell = { ctx: "", t0: 0, sent: false };
+  function dwellStart(ctx) { if (dwell.t0) return; dwell.ctx = ctx; dwell.t0 = Date.now(); }
+  function dwellSend() {
+    if (!dwell.t0 || dwell.sent) return; dwell.sent = true;
+    var sec = Math.round((Date.now() - dwell.t0) / 1000); if (sec < 1) return;
+    var body = JSON.stringify({ action: "track", ev: "dwell", ctx: dwell.ctx, sec: sec, pid: dwell.ctx === "product" ? curPid : "" });
+    try { if (navigator.sendBeacon) navigator.sendBeacon(FN, new Blob([body], { type: "application/json" })); else fetch(FN, { method: "POST", headers: { "Content-Type": "application/json" }, body: body, keepalive: true }).catch(function () {}); } catch (e) {}
+  }
+  d.addEventListener("visibilitychange", function () { if (d.visibilityState === "hidden") dwellSend(); });
+  window.addEventListener("pagehide", dwellSend);
   // 曝光：元素有一半進到畫面才算，一次頁面只算一次
   function trackView(el, ctx, items) {
     if (!el || !items.length || !("IntersectionObserver" in window)) return;
@@ -25,7 +37,8 @@
       if (!es.some(function (e) { return e.isIntersecting; })) return;
       io.disconnect();
       try { (window.dataLayer = window.dataLayer || []).push({ event: "ig_wall_view", ig_ctx: ctx, ig_count: items.length }); } catch (e) {}
-      try { fetch(FN, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "track", ev: "view", ctx: ctx, ids: items.map(function (m) { return m.id; }) }), keepalive: true }).catch(function () {}); } catch (e) {}
+      try { fetch(FN, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "track", ev: "view", ctx: ctx, ids: items.map(function (m) { return m.id; }), pid: ctx === "product" ? curPid : "" }), keepalive: true }).catch(function () {}); } catch (e) {}
+      if (ctx !== "float") dwellStart(ctx);
     }, { threshold: ctx === "float" ? 0.01 : 0.4 });
     io.observe(el);
   }
@@ -199,6 +212,7 @@
 
   // ---------- 商品頁 ----------
   function mountProduct(pid) {
+    curPid = pid;
     get("/products/" + pid).then(function (p) {
       if (!p || !p.items || !p.items.length) return;
       if (p.pos === "float") { mountFloat({ on: true, pos: "br", size: "m", autoplay: false, pages: "all", media: p.items[0] }, true); return; }

@@ -86,6 +86,15 @@ th{text-align:left;font-weight:500;color:#5A6170;font-size:13px;padding:0 12px 1
 td{padding:8px 12px;border-bottom:1px solid #F0F1F4;vertical-align:middle}
 th.r,td.r{text-align:right}
 td img{width:40px;height:40px;border-radius:4px;object-fit:cover;display:block;background:#E9EBEF}
+.tc{display:flex;flex-direction:column;gap:8px;min-width:0}
+.tc .im{position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;background:#E9EBEF}
+.tc .im img{width:100%;height:100%;object-fit:cover;display:block}
+.tc .im .rk{position:absolute;left:8px;top:8px;background:#1F2430;color:#fff;font-size:12px;line-height:22px;min-width:22px;text-align:center;border-radius:11px;padding:0 6px}
+.tc .im .vid{position:absolute;right:8px;top:8px;width:22px;height:22px;border-radius:11px;background:rgba(31,36,48,.75);display:flex;align-items:center;justify-content:center}
+.tc .im .vid svg{width:11px;height:11px;fill:#fff}
+.tc .cap{font-size:13px;line-height:1.5;color:#1F2430;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tc .nums{display:flex;gap:12px;font-size:12px;color:#5A6170}
+.tc .nums b{color:#1F2430;font-weight:700}
 .hide{display:none!important}
 .gate{max-width:420px;margin:80px auto;background:#fff;border:1px solid #E3E6EB;border-radius:10px;padding:28px;display:flex;flex-direction:column;gap:14px}
 .gate b{font-size:16px}
@@ -194,7 +203,14 @@ td img{width:40px;height:40px;border-radius:4px;object-fit:cover;display:block;b
 <div class="wrap hide" id="tab-stats">
   <div class="c12" style="display:flex;align-items:center;gap:12px"><span class="seg" id="statRange"><button data-v="7">7 天</button><button data-v="30" class="s">30 天</button><button data-v="90">90 天</button></span><span class="chips" id="statCtx"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="home">首頁牆</button><button class="chip" data-f="float">浮窗</button><button class="chip" data-f="product">商品頁</button></span></div>
   <div class="c12 kpis" id="kpis"></div>
-  <div class="card c12"><div class="h"><b>每日</b><span class="sub">曝光與點開</span><span class="end" id="chartLegend"></span></div><div id="chart"></div></div>
+  <div class="card c7"><div class="h"><b>每日</b><span class="sub">曝光與點開</span><span class="end" id="chartLegend"></span></div><div id="chart"></div></div>
+  <div class="card c5"><div class="h"><b>各區塊</b></div>
+    <table><thead><tr><th>區塊</th><th class="r">曝光</th><th class="r">點開</th><th class="r">點開率</th><th class="r">平均停留</th></tr></thead><tbody id="blockRows"></tbody></table>
+  </div>
+  <div class="card c12"><div class="h"><b>貼文點開 Top 10</b><span class="sub" id="topSub"></span></div><div class="grid" style="grid-template-columns:repeat(5,minmax(0,1fr));gap:14px" id="topCards"></div></div>
+  <div class="card c12"><div class="h"><b>商品頁</b><span class="sub">有放影片的商品</span></div>
+    <table><thead><tr><th>商品</th><th class="r">曝光</th><th class="r">點開</th><th class="r">點開率</th><th class="r">平均停留</th></tr></thead><tbody id="prodRows"></tbody></table>
+  </div>
   <div class="card c12"><div class="h"><b>各貼文</b><span class="sub" id="statRowsSub"></span></div>
     <table><thead><tr><th style="width:56px"></th><th>貼文</th><th>類型</th><th class="r">曝光</th><th class="r">點開</th><th class="r">點開率</th><th class="r">播放</th><th class="r">點 IG</th></tr></thead><tbody id="statRows"></tbody></table>
   </div>
@@ -485,6 +501,19 @@ function paintStats(){
   $('#chartLegend').innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5A6170"><i style="width:10px;height:10px;background:#D4D7DE;display:inline-block"></i>曝光<i style="width:10px;height:10px;background:#1F2430;display:inline-block;margin-left:10px"></i>點開</span>';
   var rows = Object.keys(per).map(function(id){ var t = per[id]; return Object.assign({ id:id, m:S.mediaById[id] }, t); }).filter(function(r){ return r.view || r.open || r.play || r.link; }).sort(function(a,b){ return b.open - a.open || b.view - a.view; });
   $('#statRowsSub').textContent = rows.length ? rows.length + ' 則 · 依點開排序' : '';
+  // 各區塊
+  var blk = { home:{ view:0, open:0, ds:0, dn:0 }, float:{ view:0, open:0, ds:0, dn:0 }, product:{ view:0, open:0, ds:0, dn:0 } }, prod = {};
+  days.forEach(function(d){ var r = day[d] || {}; ['home','float','product'].forEach(function(c){ blk[c].view += r[c+'_view']||0; blk[c].open += r[c+'_open']||0; blk[c].ds += r[c+'_dwell_s']||0; blk[c].dn += r[c+'_dwell_n']||0; });
+    Object.keys(r.p || {}).forEach(function(id){ var x = r.p[id]; var t = prod[id] || (prod[id] = { view:0, open:0, ds:0, dn:0 }); t.view += x.view||0; t.open += x.open||0; t.ds += x.dwell_s||0; t.dn += x.dwell_n||0; }); });
+  function dwellStr(ds, dn){ return dn ? Math.round(ds / dn) + ' 秒' : '—'; }
+  $('#blockRows').innerHTML = [['首頁牆','home'],['浮動影片','float'],['商品頁','product']].map(function(b){ var t = blk[b[1]]; return '<tr><td>' + b[0] + '</td><td class="r">' + t.view.toLocaleString() + '</td><td class="r">' + t.open.toLocaleString() + '</td><td class="r">' + pct(t.open, t.view) + '</td><td class="r">' + (b[1] === 'float' ? '—' : dwellStr(t.ds, t.dn)) + '</td></tr>'; }).join('');
+  // 貼文 Top 10 卡片
+  var top = rows.slice(0, 10);
+  $('#topSub').textContent = top.length ? '這段期間' : '';
+  $('#topCards').innerHTML = top.length ? top.map(function(r, i){ var m = r.m || {}; return '<div class="tc"><div class="im">' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="">' : '') + '<span class="rk">' + (i + 1) + '</span>' + (m.type === 'VIDEO' ? '<span class="vid">' + ICON_PLAY + '</span>' : '') + '</div><div class="cap">' + esc((m.caption || r.id).split('\n')[0]) + '</div><div class="nums"><span>點開 <b>' + r.open + '</b></span><span>曝光 ' + r.view + '</span>' + (r.play ? '<span>播放 ' + r.play + '</span>' : '') + '</div></div>'; }).join('') : '<div class="empty" style="grid-column:1/-1">這段期間還沒有資料</div>';
+  // 商品頁
+  var prows = Object.keys(prod).map(function(id){ var t = prod[id]; var c = S.products[id] || {}; return Object.assign({ id:id, title: c.title || id, sku: c.sku || '' }, t); }).filter(function(r){ return r.view || r.open; }).sort(function(a,b){ return b.open - a.open || b.view - a.view; });
+  $('#prodRows').innerHTML = prows.length ? prows.map(function(r){ return '<tr><td><a href="https://www.vvdouble.com/products/' + esc(r.id) + '" target="_blank" rel="noopener" style="text-decoration:none">' + esc(r.title) + '</a>' + (r.sku ? ' <span class="k" style="color:#5A6170;font-size:12px">' + esc(r.sku) + '</span>' : '') + '</td><td class="r">' + r.view.toLocaleString() + '</td><td class="r">' + r.open.toLocaleString() + '</td><td class="r">' + pct(r.open, r.view) + '</td><td class="r">' + dwellStr(r.ds, r.dn) + '</td></tr>'; }).join('') : '<tr><td colspan="5" class="empty">這段期間還沒有資料</td></tr>';
   $('#statRows').innerHTML = rows.length ? rows.map(function(r){ var m = r.m || {}; return '<tr><td>' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="">' : '') + '</td><td>' + esc((m.caption || r.id).split('\n')[0].slice(0, 40)) + '</td><td>' + (m.type ? typeName(m.type) : '') + '</td><td class="r">' + r.view + '</td><td class="r">' + r.open + '</td><td class="r">' + pct(r.open, r.view) + '</td><td class="r">' + r.play + '</td><td class="r">' + r.link + '</td></tr>'; }).join('') : '<tr><td colspan="8" class="empty">這段期間還沒有資料</td></tr>';
 }
 segBind('statRange', function(){ return S.statDays; }, function(v){ S.statDays = Number(v); paintStats(); });

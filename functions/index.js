@@ -9,7 +9,7 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-const VERSION = "2026-10-30a";
+const VERSION = "2026-10-30b";
 const GRAPH = "https://graph.facebook.com/v21.0";
 const SL = "https://open.shopline.io/v1";
 const MEDIA_FIELDS = "id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,like_count,comments_count,children{id,media_type,media_url,thumbnail_url}";
@@ -158,14 +158,23 @@ exports.igwall = onRequest(
     if (action === "track") {
       const origin = req.headers.origin || "";
       if (!/vvdouble\.com$|localhost|127\.0\.0\.1/.test(origin) && origin !== "null") return res.status(403).json({ error: "forbidden" });
-      // ev：view 曝光（整面牆一次送多個 id）/ open 點開 / play 播放 / link 點 IG 連結
-      const ev = ["view", "open", "play", "link"].includes(body.ev) ? body.ev : "open";
+      // ev：view 曝光（整面牆一次送多個 id）/ open 點開 / play 播放 / link 點 IG 連結 / dwell 停留秒數
+      const ev = ["view", "open", "play", "link", "dwell"].includes(body.ev) ? body.ev : "open";
       const ctx = ["home", "float", "product"].includes(body.ctx) ? body.ctx : "home";
-      const ids = (Array.isArray(body.ids) ? body.ids : [body.mediaId]).map((x) => String(x || "").replace(/[^0-9]/g, "")).filter(Boolean).slice(0, 60);
-      if (!ids.length) return res.status(400).json({ error: "mediaId" });
+      const pid = /^[0-9a-f]{24}$/i.test(String(body.pid || "")) ? String(body.pid).toLowerCase() : "";
       const day = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
       const inc = admin.database.ServerValue.increment(1);
       const up = {};
+      if (ev === "dwell") {
+        const sec = Math.min(1800, Math.max(0, Math.round(Number(body.sec) || 0)));
+        if (!sec) return res.json({ ok: true });
+        up[`stats/day/${day}/${ctx}_dwell_s`] = admin.database.ServerValue.increment(sec); up[`stats/day/${day}/${ctx}_dwell_n`] = inc;
+        if (pid) { up[`stats/day/${day}/p/${pid}/dwell_s`] = admin.database.ServerValue.increment(sec); up[`stats/day/${day}/p/${pid}/dwell_n`] = inc; }
+        await root().update(up);
+        return res.json({ ok: true });
+      }
+      const ids = (Array.isArray(body.ids) ? body.ids : [body.mediaId]).map((x) => String(x || "").replace(/[^0-9]/g, "")).filter(Boolean).slice(0, 60);
+      if (!ids.length) return res.status(400).json({ error: "mediaId" });
       ids.forEach((id) => {
         up[`stats/media/${id}/${ev}`] = inc; up[`stats/media/${id}/${ctx}_${ev}`] = inc;
         up[`stats/day/${day}/m/${id}/${ev}`] = inc; up[`stats/day/${day}/m/${id}/${ctx}_${ev}`] = inc;
@@ -174,6 +183,7 @@ exports.igwall = onRequest(
       const n = ev === "view" ? 1 : ids.length;
       up[`stats/day/${day}/${ev}`] = admin.database.ServerValue.increment(n);
       up[`stats/day/${day}/${ctx}_${ev}`] = admin.database.ServerValue.increment(n);
+      if (pid) up[`stats/day/${day}/p/${pid}/${ev}`] = admin.database.ServerValue.increment(n);
       await root().update(up);
       return res.json({ ok: true });
     }
