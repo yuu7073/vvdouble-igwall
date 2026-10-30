@@ -111,7 +111,7 @@
     var side = el("div", "vvig-side");
     var date = m.ts ? new Date(m.ts) : null;
     var dstr = date ? date.getFullYear() + "/" + ("0" + (date.getMonth() + 1)).slice(-2) + "/" + ("0" + date.getDate()).slice(-2) : "";
-    side.innerHTML = '<div class="vvig-user"><span class="vvig-av">' + ICON_IG + "</span><span>" + esc(handle || "vvdoubleofficial") + '</span><button class="vvig-close" type="button" aria-label="關閉">' + ICON_X + "</button></div>" +
+    side.innerHTML = '<div class="vvig-user"><span class="vvig-av">' + ICON_IG + "</span><span>" + esc(m.user || handle || "vvdoubleofficial") + '</span><button class="vvig-close" type="button" aria-label="關閉">' + ICON_X + "</button></div>" +
       '<div class="vvig-cap">' + esc(m.caption || "") + "</div>" +
       '<div class="vvig-meta">' + (m.likes ? m.likes.toLocaleString() + " 個讚 · " : "") + esc(dstr) + "</div>" +
       (m.link ? '<a class="vvig-go" href="' + esc(m.link) + '" target="_blank" rel="noopener">在 Instagram 查看</a>' : "");

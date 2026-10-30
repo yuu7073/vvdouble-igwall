@@ -9,10 +9,11 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-const VERSION = "2026-10-30b";
+const VERSION = "2026-10-31a";
 const GRAPH = "https://graph.facebook.com/v21.0";
 const SL = "https://open.shopline.io/v1";
 const MEDIA_FIELDS = "id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,like_count,comments_count,children{id,media_type,media_url,thumbnail_url}";
+const TAG_FIELDS = "id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,like_count,comments_count,username";
 const MAX_PAGES = 4; // 每次同步最多抓 4 頁 × 50 = 200 則
 
 const ALLOW_ORIGINS = ["https://yuu7073.github.io", "https://www.vvdouble.com", "https://vvdouble.com", "http://localhost", "http://127.0.0.1", "null"];
@@ -59,9 +60,11 @@ async function resolveIgUser(cfg) {
   return ig;
 }
 
-function trimMedia(m) {
+function trimMedia(m, src, user) {
   return {
     id: m.id,
+    src: src || "own",
+    user: m.username || user || "",
     type: m.media_type,
     url: m.media_url || "",
     thumb: m.media_type === "VIDEO" ? (m.thumbnail_url || "") : (m.media_url || ""),
@@ -81,14 +84,25 @@ async function syncMedia(cfg) {
   let next = null;
   for (let p = 0; p < MAX_PAGES; p++) {
     const j = next ? await fbGet(cfg.metaToken, next) : await fbGet(cfg.metaToken, "/" + igId + "/media", { fields: MEDIA_FIELDS, limit: 50 });
-    (j.data || []).forEach((m) => all.push(trimMedia(m)));
+    (j.data || []).forEach((m) => all.push(trimMedia(m, "own", cfg.ig.igUsername)));
     next = j.paging && j.paging.next;
     if (!next) break;
   }
   if (!all.length) throw new Error("IG 沒有回傳任何貼文");
+  // 顧客標記的貼文（需要 instagram_manage_comments 權限；沒有就跳過，不影響自己的貼文）
+  let tagged = 0, tagErr = null;
+  try {
+    next = null;
+    for (let p = 0; p < MAX_PAGES; p++) {
+      const j = next ? await fbGet(cfg.metaToken, next) : await fbGet(cfg.metaToken, "/" + igId + "/tags", { fields: TAG_FIELDS, limit: 50 });
+      (j.data || []).forEach((m) => { if (m.media_url || m.thumbnail_url) { all.push(trimMedia(m, "tag")); tagged++; } });
+      next = j.paging && j.paging.next;
+      if (!next) break;
+    }
+  } catch (e) { tagErr = e.message; console.warn("tags", e.message); }
   const up = {};
   all.forEach((m) => { up["media/" + m.id] = m; });
-  up["syncLog"] = { at: Date.now(), ok: true, count: all.length, error: null };
+  up["syncLog"] = { at: Date.now(), ok: true, count: all.length, tagged, tagError: tagErr, error: null };
   await root().update(up);
   // 已發布的內容牆要跟著換新網址（IG 圖片網址會過期）
   await renderPublic();
@@ -98,7 +112,7 @@ async function syncMedia(cfg) {
 // ---------- 公開資料（前台讀的）----------
 function pubItem(m) {
   if (!m) return null;
-  return { id: m.id, type: m.type, url: m.url, thumb: m.thumb, link: m.link, caption: (m.caption || "").slice(0, 600), likes: m.likes || 0, ts: m.ts || 0, children: m.children || null };
+  return { id: m.id, type: m.type, url: m.url, thumb: m.thumb, link: m.link, caption: (m.caption || "").slice(0, 600), likes: m.likes || 0, ts: m.ts || 0, children: m.children || null, user: m.user || "", src: m.src || "own" };
 }
 
 async function renderPublic() {
@@ -229,7 +243,7 @@ exports.igwall = onRequest(
         case "media": {
           const s = await root().child("media").get();
           const list = Object.values(s.exists() ? s.val() : {}).sort((a, b) => (b.ts || 0) - (a.ts || 0));
-          return res.json({ items: list.map((m) => ({ id: m.id, type: m.type, thumb: m.thumb, url: m.type === "VIDEO" ? m.url : "", link: m.link, caption: (m.caption || "").slice(0, 160), ts: m.ts, likes: m.likes, comments: m.comments, n: m.children ? m.children.length : 1 })) });
+          return res.json({ items: list.map((m) => ({ id: m.id, type: m.type, thumb: m.thumb, url: m.type === "VIDEO" ? m.url : "", link: m.link, caption: (m.caption || "").slice(0, 160), ts: m.ts, likes: m.likes, comments: m.comments, n: m.children ? m.children.length : 1, src: m.src || "own", user: m.user || "" })) });
         }
         case "saveHome": {
           const h = body.home || {};

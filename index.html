@@ -46,6 +46,7 @@ svg{width:16px;height:16px;flex:none}
 .th .ck{position:absolute;right:6px;top:6px;width:20px;height:20px;border-radius:10px;background:#F3AB55;display:flex;align-items:center;justify-content:center}
 .th .ck svg{width:12px;height:12px}
 .th.drag{opacity:.4}
+.th .ug{position:absolute;left:6px;bottom:6px;max-width:calc(100% - 12px);background:rgba(255,255,255,.92);color:#1F2430;font-size:10px;line-height:18px;padding:0 6px;border-radius:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .th .cap{position:absolute;left:0;right:0;bottom:0;padding:6px 8px;background:linear-gradient(transparent,rgba(31,36,48,.7));color:#fff;font-size:11px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{height:28px;padding:0 12px;border-radius:14px;border:1px solid #D4D7DE;font-size:13px;display:inline-flex;align-items:center;color:#5A6170;background:#fff}
@@ -141,7 +142,7 @@ td img{width:40px;height:40px;border-radius:4px;object-fit:cover;display:block;b
   </div>
   <div class="card c5" style="min-height:720px">
     <div class="h"><b>IG 貼文</b><span class="sub" id="igHandle"></span></div>
-    <div class="chips" id="homeFilters"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="video">影片</button><button class="chip" data-f="album">多圖</button><button class="chip" data-f="unused">未使用</button></div>
+    <div class="chips" id="homeFilters"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="video">影片</button><button class="chip" data-f="album">多圖</button><button class="chip" data-f="tag">顧客標記</button><button class="chip" data-f="unused">未使用</button></div>
     <div class="grid g4" id="homePick"></div>
     <button class="more" id="homeMore">載入更多</button>
   </div>
@@ -191,7 +192,7 @@ td img{width:40px;height:40px;border-radius:4px;object-fit:cover;display:block;b
           <div class="row"><b style="width:56px">同色款</b><span class="seg" id="pSib"><button data-v="all" class="s">一起套用</button><button data-v="one">只有這款</button></span><span class="msg" id="pSibInfo"></span></div>
         </div>
       </div>
-      <div class="h" style="padding-top:14px;border-top:1px solid #E3E6EB"><b style="font-size:14px">IG 貼文</b><span class="sub">點一下加入 · 最多 3 支</span><span class="end chips" id="pFilters"><button class="chip on" data-f="suggest">建議</button><button class="chip" data-f="video">影片</button><button class="chip" data-f="all">全部</button></span></div>
+      <div class="h" style="padding-top:14px;border-top:1px solid #E3E6EB"><b style="font-size:14px">IG 貼文</b><span class="sub">點一下加入 · 最多 3 支</span><span class="end chips" id="pFilters"><button class="chip on" data-f="suggest">建議</button><button class="chip" data-f="video">影片</button><button class="chip" data-f="tag">顧客標記</button><button class="chip" data-f="all">全部</button></span></div>
       <div class="grid g8" id="pPick"></div>
       <button class="more" id="pMore">載入更多</button>
       <div class="foot" style="border-top:0;padding-top:0"><span class="msg" id="pMsg"></span><span class="end"><button class="btn" id="pRemove">移除商品頁影片</button><button class="btn p" id="pPub">發布到官網</button></span></div>
@@ -243,7 +244,7 @@ function swPaint(id, v){ $('#'+id).classList.toggle('on', !!v); }
 function thumb(m, opts){
   opts = opts || {};
   var b = document.createElement('button'); b.type = 'button'; b.className = 'th' + (opts.cls ? ' ' + opts.cls : '') + (opts.on ? ' on' : '');
-  b.innerHTML = '<img loading="lazy" src="' + esc(m.thumb) + '" alt="">' + (opts.num ? '<span class="num">' + opts.num + '</span>' : '') + (m.type === 'VIDEO' && !opts.on ? '<span class="vid">' + ICON_PLAY + '</span>' : '') + (opts.on ? '<span class="ck">' + ICON_CK + '</span>' : '') + (opts.x ? '<span class="x">' + ICON_X + '</span>' : '') + (opts.cap ? '<span class="cap">' + esc((m.caption || '').split('\n')[0]) + '</span>' : '');
+  b.innerHTML = '<img loading="lazy" src="' + esc(m.thumb) + '" alt="">' + (opts.num ? '<span class="num">' + opts.num + '</span>' : '') + (m.type === 'VIDEO' && !opts.on ? '<span class="vid">' + ICON_PLAY + '</span>' : '') + (opts.on ? '<span class="ck">' + ICON_CK + '</span>' : '') + (opts.x ? '<span class="x">' + ICON_X + '</span>' : '') + (opts.cap ? '<span class="cap">' + esc((m.caption || '').split('\n')[0]) + '</span>' : '') + (m.src === 'tag' ? '<span class="ug">@' + esc(m.user) + '</span>' : '');
   b.title = (m.caption || '').slice(0, 120);
   return b;
 }
@@ -255,7 +256,7 @@ async function loadStatus(){
     var st = await api('status'); S.status = st;
     $('#syncInfo').textContent = st.sync ? ('上次同步 ' + fmt(st.sync.at) + (st.sync.ok ? '' : ' 失敗')) : '尚未同步';
     $('#syncInfo').style.color = st.sync && !st.sync.ok ? '#C8322B' : '';
-    $('#igHandle').textContent = st.ig.username ? '@' + st.ig.username + ' · 點一下加入' : '';
+    $('#igHandle').textContent = st.ig.username ? '@' + st.ig.username + (st.sync && st.sync.tagged ? ' · 顧客標記 ' + st.sync.tagged + ' 則' : '') + ' · 點一下加入' : '';
     $('#gate b').textContent = '連結 Instagram'; $('#gateBtn').classList.remove('hide');
     if (!st.ig.userId || !st.mediaCount) { $('#gate').classList.remove('hide'); $$('.wrap').forEach(function(w){ w.classList.add('hide'); }); if (!st.meta) say($('#gateMsg'), '尚未設定 Meta：請先在 FB 貼文工具換好 Token', 'err'); return; }
     $('#gate b').textContent = '連結 Instagram'; $('#gateBtn').classList.remove('hide');
@@ -304,6 +305,7 @@ function filtered(f){
   return S.media.filter(function(m){
     if (f === 'video') return m.type === 'VIDEO';
     if (f === 'album') return m.type === 'CAROUSEL_ALBUM';
+    if (f === 'tag') return m.src === 'tag';
     if (f === 'unused') return S.home.items.indexOf(m.id) < 0;
     return true;
   });
@@ -436,7 +438,7 @@ function paintProdPanel(){
   for (var k = S.pItems.length; k < 3; k++) { var e = document.createElement('div'); e.style.cssText = 'width:96px;aspect-ratio:3/4;border:1px dashed #D4D7DE;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8A909C'; e.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M12 5v14M5 12h14"/></svg>'; box.appendChild(e); }
   segPaint('pPos', S.pPos); segPaint('pSib', S.pSib); paintSib();
   var g = $('#pPick'); g.innerHTML = '';
-  var list = S.pF === 'suggest' ? suggest(p) : (S.pF === 'video' ? S.media.filter(function(m){ return m.type === 'VIDEO'; }) : S.media);
+  var list = S.pF === 'suggest' ? suggest(p) : (S.pF === 'video' ? S.media.filter(function(m){ return m.type === 'VIDEO'; }) : (S.pF === 'tag' ? S.media.filter(function(m){ return m.src === 'tag'; }) : S.media));
   if (S.pF === 'suggest' && !list.length) g.innerHTML = '<div class="empty" style="grid-column:1/-1">沒有提到這個商品的貼文，切到「影片」或「全部」挑</div>';
   list.slice(0, S.pN).forEach(function(m){
     var on = S.pItems.indexOf(m.id) >= 0;
@@ -510,7 +512,7 @@ function paintStats(){
   // 貼文 Top 10 卡片
   var top = rows.slice(0, 10);
   $('#topSub').textContent = top.length ? '這段期間' : '';
-  $('#topCards').innerHTML = top.length ? top.map(function(r, i){ var m = r.m || {}; return '<div class="tc"><div class="im">' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="">' : '') + '<span class="rk">' + (i + 1) + '</span>' + (m.type === 'VIDEO' ? '<span class="vid">' + ICON_PLAY + '</span>' : '') + '</div><div class="cap">' + esc((m.caption || r.id).split('\n')[0]) + '</div><div class="nums"><span>點開 <b>' + r.open + '</b></span><span>曝光 ' + r.view + '</span>' + (r.play ? '<span>播放 ' + r.play + '</span>' : '') + '</div></div>'; }).join('') : '<div class="empty" style="grid-column:1/-1">這段期間還沒有資料</div>';
+  $('#topCards').innerHTML = top.length ? top.map(function(r, i){ var m = r.m || {}; return '<div class="tc"><div class="im">' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="">' : '') + '<span class="rk">' + (i + 1) + '</span>' + (m.type === 'VIDEO' ? '<span class="vid">' + ICON_PLAY + '</span>' : '') + '</div><div class="cap">' + esc((m.caption || r.id).split('\n')[0]) + '</div><div class="nums"><span>@' + esc(m.user || (S.status && S.status.ig.username) || '') + '</span><span>點開 <b>' + r.open + '</b></span><span>曝光 ' + r.view + '</span>' + (r.play ? '<span>播放 ' + r.play + '</span>' : '') + '</div></div>'; }).join('') : '<div class="empty" style="grid-column:1/-1">這段期間還沒有資料</div>';
   // 商品頁
   var prows = Object.keys(prod).map(function(id){ var t = prod[id]; var c = S.products[id] || {}; return Object.assign({ id:id, title: c.title || id, sku: c.sku || '' }, t); }).filter(function(r){ return r.view || r.open; }).sort(function(a,b){ return b.open - a.open || b.view - a.view; });
   $('#prodRows').innerHTML = prows.length ? prows.map(function(r){ return '<tr><td><a href="https://www.vvdouble.com/products/' + esc(r.id) + '" target="_blank" rel="noopener" style="text-decoration:none">' + esc(r.title) + '</a>' + (r.sku ? ' <span class="k" style="color:#5A6170;font-size:12px">' + esc(r.sku) + '</span>' : '') + '</td><td class="r">' + r.view.toLocaleString() + '</td><td class="r">' + r.open.toLocaleString() + '</td><td class="r">' + pct(r.open, r.view) + '</td><td class="r">' + dwellStr(r.ds, r.dn) + '</td></tr>'; }).join('') : '<tr><td colspan="5" class="empty">這段期間還沒有資料</td></tr>';
