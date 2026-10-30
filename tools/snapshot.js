@@ -23,7 +23,7 @@ const [,, url, out, kind] = process.argv;
   html = html.replace(/<body([^>]*)>/i, `<body$1>\n${bar}`);
   // 商品 ID：從頁面 meta 或 trackerEventData 抓
   if (kind === "product") {
-    const m = html.match(/"Product ID":"([0-9a-f]{24})"/) || html.match(/product_id["']?\s*[:=]\s*["']([0-9a-f]{24})/) || html.match(/products\/([0-9a-f]{24})/);
+    const m = html.match(/data-product-id="([0-9a-f]{24})"/) || html.match(/"Product ID":"([0-9a-f]{24})"/) || html.match(/product_id["']?\s*[:=]\s*["']([0-9a-f]{24})/);
     html = html.replace("__PID__", m ? m[1] : "");
   }
   fs.mkdirSync(require("path").dirname(out), { recursive: true });
