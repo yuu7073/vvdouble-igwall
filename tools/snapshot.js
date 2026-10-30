@@ -10,7 +10,8 @@ const [,, url, out, kind] = process.argv;
   // Tagnology 首頁牆 → 我們的牆
   html = html.replace(/<!-- Embed Tagnology Code -->[\s\S]*?<!-- End Embed Tagnology Code -->/g, '<div id="vv-igwall" style="max-width:1200px;margin:0 auto;padding:0 15px"></div>');
   html = html.replace(/<div class="embed-tagnology"[\s\S]*?<\/div>/g, '<div id="vv-igwall" style="max-width:1200px;margin:0 auto;padding:0 15px"></div>');
-  // lazy 圖片
+  // lazy 圖片（sl-lazy 用 data-srcset）
+  html = html.replace(/\sdata-srcset="/gi, ' srcset="').replace(/\sdata-sizes="/gi, ' sizes="');
   html = html.replace(/<img([^>]*?)\sdata-src=("[^"]*")([^>]*)>/gi, (m, a, src, b) => /\ssrc=/.test(a + b) ? m.replace(/\ssrc="[^"]*"/, " src=" + src) : `<img${a} src=${src}${b}>`);
   // ng-cloak / ng-hide 會讓沒跑 Angular 的內容整片隱藏
   html = html.replace(/\sng-cloak(=""| )/g, " ").replace(/class="([^"]*)\bng-cloak\b/g, 'class="$1');
