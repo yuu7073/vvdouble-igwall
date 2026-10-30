@@ -1,0 +1,27 @@
+name: Snapshot vvdouble.com for preview
+on:
+  workflow_dispatch:
+    inputs:
+      product:
+        description: 商品頁網址（可留空）
+        required: false
+        default: "https://www.vvdouble.com/products/26au0317-030"
+permissions:
+  contents: write
+jobs:
+  snap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/snapshot.js "https://www.vvdouble.com/" preview/home.html home
+      - run: node tools/snapshot.js "${{ github.event.inputs.product }}" preview/product.html product
+      - name: Commit
+        run: |
+          git config user.name "snapshot-bot"
+          git config user.email "noreply@github.com"
+          git add preview
+          git diff --cached --quiet || git commit -m "官網快照 $(date -u +%Y-%m-%d)"
+          git push
