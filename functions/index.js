@@ -9,7 +9,7 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-const VERSION = "2026-10-29a";
+const VERSION = "2026-10-30a";
 const GRAPH = "https://graph.facebook.com/v21.0";
 const SL = "https://open.shopline.io/v1";
 const MEDIA_FIELDS = "id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,like_count,comments_count,children{id,media_type,media_url,thumbnail_url}";
@@ -158,13 +158,23 @@ exports.igwall = onRequest(
     if (action === "track") {
       const origin = req.headers.origin || "";
       if (!/vvdouble\.com$|localhost|127\.0\.0\.1/.test(origin) && origin !== "null") return res.status(403).json({ error: "forbidden" });
-      const id = String(body.mediaId || "").replace(/[^0-9]/g, "");
-      const ev = ["open", "play", "link"].includes(body.ev) ? body.ev : "open";
+      // ev：view 曝光（整面牆一次送多個 id）/ open 點開 / play 播放 / link 點 IG 連結
+      const ev = ["view", "open", "play", "link"].includes(body.ev) ? body.ev : "open";
       const ctx = ["home", "float", "product"].includes(body.ctx) ? body.ctx : "home";
-      if (!id) return res.status(400).json({ error: "mediaId" });
+      const ids = (Array.isArray(body.ids) ? body.ids : [body.mediaId]).map((x) => String(x || "").replace(/[^0-9]/g, "")).filter(Boolean).slice(0, 60);
+      if (!ids.length) return res.status(400).json({ error: "mediaId" });
       const day = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
       const inc = admin.database.ServerValue.increment(1);
-      await root().update({ [`stats/media/${id}/${ev}`]: inc, [`stats/media/${id}/${ctx}_${ev}`]: inc, [`stats/day/${day}/${ctx}_${ev}`]: inc, [`stats/day/${day}/${ev}`]: inc });
+      const up = {};
+      ids.forEach((id) => {
+        up[`stats/media/${id}/${ev}`] = inc; up[`stats/media/${id}/${ctx}_${ev}`] = inc;
+        up[`stats/day/${day}/m/${id}/${ev}`] = inc; up[`stats/day/${day}/m/${id}/${ctx}_${ev}`] = inc;
+      });
+      // 牆的曝光算一次（不乘以格數）
+      const n = ev === "view" ? 1 : ids.length;
+      up[`stats/day/${day}/${ev}`] = admin.database.ServerValue.increment(n);
+      up[`stats/day/${day}/${ctx}_${ev}`] = admin.database.ServerValue.increment(n);
+      await root().update(up);
       return res.json({ ok: true });
     }
 
@@ -261,8 +271,10 @@ exports.igwall = onRequest(
           return res.json({ items: list, page });
         }
         case "stats": {
-          const [ms, ds] = await Promise.all([root().child("stats/media").get(), root().child("stats/day").get()]);
-          return res.json({ media: ms.exists() ? ms.val() : {}, day: ds.exists() ? ds.val() : {} });
+          // 只回最近 90 天的每日資料（含每則貼文）
+          const since = new Date(Date.now() + 8 * 3600e3 - 90 * 86400e3).toISOString().slice(0, 10);
+          const ds = await root().child("stats/day").orderByKey().startAt(since).get();
+          return res.json({ day: ds.exists() ? ds.val() : {} });
         }
         default:
           return res.status(400).json({ error: "unknown action " + action });

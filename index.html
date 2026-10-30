@@ -192,10 +192,11 @@ td img{width:40px;height:40px;border-radius:4px;object-fit:cover;display:block;b
 
 <!-- 成效 -->
 <div class="wrap hide" id="tab-stats">
-  <div class="c12" style="display:flex;align-items:center;gap:12px"><span class="seg" id="statRange"><button data-v="7">7 天</button><button data-v="30" class="s">30 天</button><button data-v="90">90 天</button></span><span class="msg">點擊次數由前台回報；GA 報表之後再接</span></div>
+  <div class="c12" style="display:flex;align-items:center;gap:12px"><span class="seg" id="statRange"><button data-v="7">7 天</button><button data-v="30" class="s">30 天</button><button data-v="90">90 天</button></span><span class="chips" id="statCtx"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="home">首頁牆</button><button class="chip" data-f="float">浮窗</button><button class="chip" data-f="product">商品頁</button></span></div>
   <div class="c12 kpis" id="kpis"></div>
-  <div class="card c12"><div class="h"><b>各貼文</b><span class="end chips" id="statCtx"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="home">首頁牆</button><button class="chip" data-f="float">浮窗</button><button class="chip" data-f="product">商品頁</button></span></div>
-    <table><thead><tr><th style="width:56px"></th><th>貼文</th><th>類型</th><th class="r">點開</th><th class="r">播放</th><th class="r">點 IG 連結</th></tr></thead><tbody id="statRows"></tbody></table>
+  <div class="card c12"><div class="h"><b>每日</b><span class="sub">曝光與點開</span><span class="end" id="chartLegend"></span></div><div id="chart"></div></div>
+  <div class="card c12"><div class="h"><b>各貼文</b><span class="sub" id="statRowsSub"></span></div>
+    <table><thead><tr><th style="width:56px"></th><th>貼文</th><th>類型</th><th class="r">曝光</th><th class="r">點開</th><th class="r">點開率</th><th class="r">播放</th><th class="r">點 IG</th></tr></thead><tbody id="statRows"></tbody></table>
   </div>
 </div>
 
@@ -452,16 +453,39 @@ async function loadStats(){
   try { S.stats = await api('stats'); } catch (e) { $('#kpis').innerHTML = '<div class="msg err">' + esc(e.message) + '</div>'; return; }
   paintStats();
 }
+function dayKey(ts){ return new Date(ts + 8 * 3600e3).toISOString().slice(0, 10); }
+function pct(a, b){ return b ? (100 * a / b).toFixed(1) + '%' : '—'; }
 function paintStats(){
   if (!S.stats) return;
-  var day = S.stats.day || {}, media = S.stats.media || {};
-  var since = Date.now() - S.statDays * 86400e3;
-  var sum = {};
-  Object.keys(day).forEach(function(d){ if (Date.parse(d) >= since) Object.keys(day[d]).forEach(function(k){ sum[k] = (sum[k] || 0) + day[d][k]; }); });
-  var kp = [['點開貼文', sum.open], ['影片播放', sum.play], ['點 IG 連結', sum.link], ['浮窗點開', sum.float_open], ['商品頁點開', sum.product_open]];
-  $('#kpis').innerHTML = kp.map(function(k){ return '<div class="kpi"><small>' + k[0] + '</small><strong>' + (k[1] || 0).toLocaleString() + '</strong></div>'; }).join('');
-  var rows = Object.keys(media).map(function(id){ var s = media[id]; var pre = S.statCtx === 'all' ? '' : S.statCtx + '_'; return { id:id, m:S.mediaById[id], open: s[pre+'open']||0, play: s[pre+'play']||0, link: s[pre+'link']||0 }; }).filter(function(r){ return r.open || r.play || r.link; }).sort(function(a,b){ return b.open - a.open; });
-  $('#statRows').innerHTML = rows.length ? rows.map(function(r){ var m = r.m || {}; return '<tr><td>' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="">' : '') + '</td><td>' + esc((m.caption || r.id).split('\n')[0].slice(0, 40)) + '</td><td>' + (m.type ? typeName(m.type) : '') + '</td><td class="r">' + r.open + '</td><td class="r">' + r.play + '</td><td class="r">' + r.link + '</td></tr>'; }).join('') : '<tr><td colspan="6" class="empty">還沒有資料（累計總數，不分天）</td></tr>';
+  var day = S.stats.day || {};
+  var pre = S.statCtx === 'all' ? '' : S.statCtx + '_';
+  var days = []; for (var i = S.statDays - 1; i >= 0; i--) days.push(dayKey(Date.now() - i * 86400e3));
+  var sum = { view:0, open:0, play:0, link:0 }, series = [], per = {};
+  days.forEach(function(d){
+    var r = day[d] || {}; var v = r[pre+'view']||0, o = r[pre+'open']||0;
+    sum.view += v; sum.open += o; sum.play += r[pre+'play']||0; sum.link += r[pre+'link']||0;
+    series.push({ d:d, view:v, open:o });
+    Object.keys(r.m || {}).forEach(function(id){ var m = r.m[id]; var t = per[id] || (per[id] = { view:0, open:0, play:0, link:0 }); t.view += m[pre+'view']||0; t.open += m[pre+'open']||0; t.play += m[pre+'play']||0; t.link += m[pre+'link']||0; });
+  });
+  var kp = [['曝光', sum.view.toLocaleString()], ['點開貼文', sum.open.toLocaleString()], ['點開率', pct(sum.open, sum.view)], ['影片播放', sum.play.toLocaleString()], ['點 IG 連結', sum.link.toLocaleString()]];
+  $('#kpis').innerHTML = kp.map(function(k){ return '<div class="kpi"><small>' + k[0] + '</small><strong>' + k[1] + '</strong></div>'; }).join('');
+  // 每日長條圖（曝光淡色、點開深色）
+  var W = 1100, H = 160, pad = 28, n = series.length, bw = Math.max(2, Math.floor((W - pad * 2) / n) - 2);
+  var maxV = Math.max(1, Math.max.apply(null, series.map(function(x){ return x.view; })));
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block" role="img" aria-label="每日曝光與點開">';
+  series.forEach(function(x, i){
+    var cx = pad + i * ((W - pad * 2) / n);
+    var hv = Math.round((H - 40) * x.view / maxV), ho = Math.max(x.open ? 2 : 0, Math.round((H - 40) * x.open / maxV));
+    svg += '<rect x="' + cx + '" y="' + (H - 24 - hv) + '" width="' + bw + '" height="' + hv + '" fill="#D4D7DE"><title>' + x.d + ' 曝光 ' + x.view + '</title></rect>';
+    svg += '<rect x="' + cx + '" y="' + (H - 24 - ho) + '" width="' + bw + '" height="' + ho + '" fill="#1F2430"><title>' + x.d + ' 點開 ' + x.open + '</title></rect>';
+    if (n <= 14 || i % Math.ceil(n / 12) === 0) svg += '<text x="' + (cx + bw / 2) + '" y="' + (H - 6) + '" font-size="10" fill="#8A909C" text-anchor="middle">' + x.d.slice(5) + '</text>';
+  });
+  svg += '</svg>';
+  $('#chart').innerHTML = svg;
+  $('#chartLegend').innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5A6170"><i style="width:10px;height:10px;background:#D4D7DE;display:inline-block"></i>曝光<i style="width:10px;height:10px;background:#1F2430;display:inline-block;margin-left:10px"></i>點開</span>';
+  var rows = Object.keys(per).map(function(id){ var t = per[id]; return Object.assign({ id:id, m:S.mediaById[id] }, t); }).filter(function(r){ return r.view || r.open || r.play || r.link; }).sort(function(a,b){ return b.open - a.open || b.view - a.view; });
+  $('#statRowsSub').textContent = rows.length ? rows.length + ' 則 · 依點開排序' : '';
+  $('#statRows').innerHTML = rows.length ? rows.map(function(r){ var m = r.m || {}; return '<tr><td>' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="">' : '') + '</td><td>' + esc((m.caption || r.id).split('\n')[0].slice(0, 40)) + '</td><td>' + (m.type ? typeName(m.type) : '') + '</td><td class="r">' + r.view + '</td><td class="r">' + r.open + '</td><td class="r">' + pct(r.open, r.view) + '</td><td class="r">' + r.play + '</td><td class="r">' + r.link + '</td></tr>'; }).join('') : '<tr><td colspan="8" class="empty">這段期間還沒有資料</td></tr>';
 }
 segBind('statRange', function(){ return S.statDays; }, function(v){ S.statDays = Number(v); paintStats(); });
 chipBind('statCtx', function(f){ S.statCtx = f; paintStats(); });

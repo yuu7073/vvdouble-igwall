@@ -18,6 +18,17 @@
     try { (window.dataLayer = window.dataLayer || []).push({ event: "ig_wall_" + ev, ig_ctx: ctx, ig_media: m.id, ig_type: m.type }); } catch (e) {}
     try { fetch(FN, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "track", ev: ev, ctx: ctx, mediaId: m.id }), keepalive: true }).catch(function () {}); } catch (e) {}
   }
+  // 曝光：元素有一半進到畫面才算，一次頁面只算一次
+  function trackView(el, ctx, items) {
+    if (!el || !items.length || !("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(function (es) {
+      if (!es.some(function (e) { return e.isIntersecting; })) return;
+      io.disconnect();
+      try { (window.dataLayer = window.dataLayer || []).push({ event: "ig_wall_view", ig_ctx: ctx, ig_count: items.length }); } catch (e) {}
+      try { fetch(FN, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "track", ev: "view", ctx: ctx, ids: items.map(function (m) { return m.id; }) }), keepalive: true }).catch(function () {}); } catch (e) {}
+    }, { threshold: ctx === "float" ? 0.01 : 0.4 });
+    io.observe(el);
+  }
   var ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
   var ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
   var ICON_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
@@ -157,6 +168,7 @@
       });
       wall.appendChild(grid);
       host.innerHTML = ""; host.appendChild(wall);
+      trackView(grid, "home", h.items.slice(0, window.innerWidth >= 768 ? maxD : maxM));
     });
   }
   var st2 = el("style"); st2.textContent = ".vvig-mOff{display:none}@media(min-width:768px){.vvig-mOff{display:block}.vvig-dOff{display:none}}"; d.head.appendChild(st2);
@@ -180,8 +192,9 @@
     var x = el("button", "vvig-fx", ICON_X); x.type = "button"; x.setAttribute("aria-label", "關閉");
     x.addEventListener("click", function (e) { e.stopPropagation(); box.remove(); try { sessionStorage.setItem("vvig_float_off", m.id); } catch (e2) {} });
     box.appendChild(x);
-    box.addEventListener("click", function () { openBox(m, "float", true); });
+    box.addEventListener("click", function () { openBox(m, fromProduct ? "product" : "float", true); });
     d.body.appendChild(box);
+    trackView(box, fromProduct ? "product" : "float", [m]);
   }
 
   // ---------- 商品頁 ----------
@@ -194,6 +207,7 @@
       var row = el("div", "vvig-prow");
       p.items.slice(0, 3).forEach(function (m) { row.appendChild(thumbBtn(m, "vvig-pit", "product")); });
       wrap.appendChild(row);
+      trackView(row, "product", p.items.slice(0, 3));
       var tries = 0;
       (function place() {
         var anchor = p.pos === "desc" ? d.querySelector(".ProductDetail-description") : d.querySelector(".product-detail-button-container");
