@@ -86,7 +86,6 @@
     ".vvig-float img,.vvig-float video{width:100%;aspect-ratio:9/16;object-fit:cover;display:block}" +
     ".vvig-fplay{position:absolute;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:18px;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center}.vvig-fplay svg{width:16px;height:16px;fill:#1F2430}" +
     ".vvig-fx{position:absolute;right:6px;top:6px;width:22px;height:22px;border-radius:11px;border:0;background:rgba(255,255,255,.9);color:#1F2430;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}.vvig-fx svg{width:10px;height:10px}" +
-    ".vvig-fcap{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;background:linear-gradient(transparent,rgba(31,36,48,.75));color:#fff;font-size:11px;line-height:1.4;max-height:3.6em;overflow:hidden;pointer-events:none}" +
     "@media(max-width:767px){.vvig-float{bottom:72px}.vvig-float.vvig-s{width:80px}.vvig-float.vvig-m{width:96px}.vvig-float.vvig-l{width:120px}}" +
     /* 商品頁 */
     ".vvig-prod{margin:16px 0;font-family:inherit}" +
@@ -193,7 +192,6 @@
       var im = el("img"); im.src = m.thumb || m.url; im.alt = ""; box.appendChild(im);
       if (m.type === "VIDEO") box.appendChild(el("span", "vvig-fplay", ICON_PLAY));
     }
-    if (m.caption) box.appendChild(el("div", "vvig-fcap", esc(m.caption.split("\n")[0].slice(0, 40))));
     var x = el("button", "vvig-fx", ICON_X); x.type = "button"; x.setAttribute("aria-label", "關閉");
     x.addEventListener("click", function (e) { e.stopPropagation(); box.remove(); try { sessionStorage.setItem("vvig_float_off", m.id); } catch (e2) {} });
     box.appendChild(x);
