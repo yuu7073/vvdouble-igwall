@@ -9,7 +9,7 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-const VERSION = "2026-11-02a";
+const VERSION = "2026-11-02b";
 const GRAPH = "https://graph.facebook.com/v21.0";
 const SL = "https://open.shopline.io/v1";
 const MEDIA_FIELDS = "id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,like_count,comments_count,children{id,media_type,media_url,thumbnail_url}";
@@ -300,6 +300,11 @@ exports.igwall = onRequest(
           const since = new Date(Date.now() + 8 * 3600e3 - 90 * 86400e3).toISOString().slice(0, 10);
           const ds = await root().child("stats/day").orderByKey().startAt(since).get();
           return res.json({ day: ds.exists() ? ds.val() : {} });
+        }
+        case "resetStats": {
+          // 清空全部成效資料（上線前清掉預覽測試數據用）
+          await root().child("stats").remove();
+          return res.json({ ok: true, at: Date.now() });
         }
         default:
           return res.status(400).json({ error: "unknown action " + action });
