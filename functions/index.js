@@ -9,7 +9,7 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-const VERSION = "2026-10-31a";
+const VERSION = "2026-11-02a";
 const GRAPH = "https://graph.facebook.com/v21.0";
 const SL = "https://open.shopline.io/v1";
 const MEDIA_FIELDS = "id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,like_count,comments_count,children{id,media_type,media_url,thumbnail_url}";
@@ -248,9 +248,10 @@ exports.igwall = onRequest(
         case "saveHome": {
           const h = body.home || {};
           const items = Array.isArray(h.items) ? h.items.map(String).filter(Boolean).slice(0, 60) : [];
+          const pins = Array.isArray(h.pins) ? h.pins.map(String).filter((id) => items.includes(id)) : [];
           const cols = h.cols || {};
           const clamp = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, Math.round(n))) : d; };
-          await root().child("config/home").set({ on: h.on !== false, title: String(h.title == null ? "FOLLOW US" : h.title).slice(0, 60), items, cols: { d: clamp(cols.d, 2, 8, 6), r: clamp(cols.r, 1, 6, 3), m: clamp(cols.m, 1, 4, 3), mr: clamp(cols.mr, 1, 8, 4) }, updatedAt: Date.now(), by: String(body.by || "").slice(0, 40) });
+          await root().child("config/home").set({ on: h.on !== false, title: String(h.title == null ? "FOLLOW US" : h.title).slice(0, 60), items, pins, cols: { d: clamp(cols.d, 2, 8, 6), r: clamp(cols.r, 1, 6, 3), m: clamp(cols.m, 1, 4, 3), mr: clamp(cols.mr, 1, 8, 4) }, updatedAt: Date.now(), by: String(body.by || "").slice(0, 40) });
           return res.json({ ok: true });
         }
         case "saveFloat": {

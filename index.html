@@ -42,6 +42,10 @@ svg{width:16px;height:16px;flex:none}
 .th .vid svg{width:10px;height:10px;fill:#fff}
 .th .x{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid #D4D7DE}
 .th .x svg{width:10px;height:10px}
+.th .pin{position:absolute;left:6px;bottom:6px;width:22px;height:22px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid #D4D7DE;opacity:0;transition:opacity .15s}
+.th:hover .pin,.th .pin.on{opacity:1}
+.th .pin svg{width:12px;height:12px;fill:none;stroke:#1F2430;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.th .pin.on{background:#1F2430;border-color:#1F2430}.th .pin.on svg{stroke:#fff;fill:#fff}
 .th.on::after{content:"";position:absolute;inset:0;border:3px solid #F3AB55;border-radius:6px;pointer-events:none}
 .th .ck{position:absolute;right:6px;top:6px;width:20px;height:20px;border-radius:10px;background:#F3AB55;display:flex;align-items:center;justify-content:center}
 .th .ck svg{width:12px;height:12px}
@@ -128,7 +132,7 @@ td img{width:40px;height:40px;border-radius:4px;object-fit:cover;display:block;b
 <!-- 首頁牆 -->
 <div class="wrap" id="tab-home">
   <div class="card c7" style="min-height:720px">
-    <div class="h"><b>官網顯示中</b><span class="sub" id="homeCount">0 格 · 拖曳可換順序</span><span class="end"><span class="dot" id="homeDot"></span><span id="homeState">未發布</span></span></div>
+    <div class="h"><b>官網顯示中</b><span class="sub" id="homeCount">0 格 · 拖曳可換順序</span><button class="btn sm" id="homeSort"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v12M8 14l4 4 4-4"/><path d="M4 6h16M4 10h10"/></svg>照時間排序</button><span class="end"><span class="dot" id="homeDot"></span><span id="homeState">未發布</span></span></div>
     <div class="grid g6" id="homeGrid"></div>
     <div class="empty hide" id="homeEmpty">右邊點貼文加進來</div>
     <div class="foot">
@@ -282,8 +286,14 @@ function paintHome(){
   S.home.items = items.map(function(m){ return m.id; });
   $('#homeCount').textContent = items.length + ' 格 · 拖曳可換順序';
   $('#homeEmpty').classList.toggle('hide', items.length > 0);
+  S.home.pins = (S.home.pins || []).filter(function(id){ return S.home.items.indexOf(id) >= 0; });
   items.forEach(function(m, i){
     var b = thumb(m, { num: i + 1, x: true }); b.draggable = true; b.dataset.id = m.id;
+    var pinned = S.home.pins.indexOf(m.id) >= 0;
+    var pin = document.createElement('span'); pin.className = 'pin' + (pinned ? ' on' : ''); pin.title = pinned ? '取消釘選' : '釘選（排序時固定位置）';
+    pin.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 17v5M9 3h6l-1 7 3 3H7l3-3z"/></svg>';
+    pin.addEventListener('click', function(e){ e.stopPropagation(); var k = S.home.pins.indexOf(m.id); if (k >= 0) S.home.pins.splice(k, 1); else S.home.pins.push(m.id); paintHome(); });
+    b.appendChild(pin);
     b.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); S.home.items.splice(i, 1); paintHome(); paintHomePick(); });
     b.addEventListener('dragstart', function(e){ S.dragId = m.id; b.classList.add('drag'); e.dataTransfer.effectAllowed = 'move'; });
     b.addEventListener('dragend', function(){ b.classList.remove('drag'); });
@@ -323,6 +333,14 @@ function paintHomePick(){
 }
 $$('#tab-home .step button').forEach(function(b){ b.addEventListener('click', function(){ var k = b.dataset.k, v = Number(b.dataset.v); var lim = { d:[2,8], r:[1,6], m:[1,4], mr:[1,8] }[k]; S.home.cols[k] = Math.min(lim[1], Math.max(lim[0], S.home.cols[k] + v)); paintHome(); }); });
 chipBind('homeFilters', function(f){ S.homeF = f; S.homeN = 60; paintHomePick(); });
+// 照時間排序：釘選的留在原位，其他依 IG 發文時間新→舊填進剩下的格子
+$('#homeSort').addEventListener('click', function(){
+  var pins = S.home.pins || [];
+  var fixed = {}; S.home.items.forEach(function(id, i){ if (pins.indexOf(id) >= 0) fixed[i] = id; });
+  var rest = S.home.items.filter(function(id){ return pins.indexOf(id) < 0; }).sort(function(a, b){ return ((S.mediaById[b] || {}).ts || 0) - ((S.mediaById[a] || {}).ts || 0); });
+  var out = []; for (var i = 0; i < S.home.items.length; i++) out.push(fixed[i] !== undefined ? fixed[i] : rest.shift());
+  S.home.items = out; paintHome();
+});
 $('#homeMore').addEventListener('click', function(){ S.homeN += 60; paintHomePick(); });
 $('#homeTitle').addEventListener('input', function(){ S.home.title = $('#homeTitle').value; });
 $('#homePub').addEventListener('click', async function(){
