@@ -51,8 +51,13 @@
   // ---------- 樣式 ----------
   var css = "" +
     ".vvig-wall{margin:0 auto;padding:0 0 8px;font-family:inherit;color:#1F2430}" +
-        ".vvig-grid{display:grid;gap:6px;grid-template-columns:repeat(var(--vvig-m),minmax(0,1fr))}" +
-    "@media(min-width:768px){.vvig-grid{grid-template-columns:repeat(var(--vvig-d),minmax(0,1fr))}}" +
+    // 響應式：手機 m 欄 → 大手機 m+1 → 平板 → 小筆電 → 桌機 d 欄（JS 依 d/m 算好各段欄數）
+    ".vvig-grid{display:grid;gap:4px;grid-template-columns:repeat(var(--vvig-m),minmax(0,1fr))}" +
+    "@media(min-width:480px){.vvig-grid{gap:5px;grid-template-columns:repeat(var(--vvig-m2),minmax(0,1fr))}}" +
+    "@media(min-width:768px){.vvig-grid{gap:6px;grid-template-columns:repeat(var(--vvig-t),minmax(0,1fr))}}" +
+    "@media(min-width:1024px){.vvig-grid{grid-template-columns:repeat(var(--vvig-l),minmax(0,1fr))}}" +
+    "@media(min-width:1280px){.vvig-grid{grid-template-columns:repeat(var(--vvig-d),minmax(0,1fr))}}" +
+    "@media(max-width:767px){.vvig-grid .vvig-badge{width:20px;height:20px;right:6px;top:6px}.vvig-grid .vvig-badge svg{width:11px;height:11px}}" +
     ".vvig-it{position:relative;aspect-ratio:4/5;overflow:hidden;background:#EEE;border:0;padding:0;cursor:pointer;display:block;width:100%}" +
     ".vvig-it img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}" +
     ".vvig-it:hover img{transform:scale(1.04)}" +
@@ -160,7 +165,11 @@
       handle = h.handle || handle;
       var c = h.cols || { d: 6, r: 3, m: 3, mr: 4 };
       var wall = el("div", "vvig-wall");
-      wall.style.setProperty("--vvig-d", c.d); wall.style.setProperty("--vvig-m", c.m);
+      var d = +c.d || 6, m = +c.m || 3;
+      wall.style.setProperty("--vvig-d", d); wall.style.setProperty("--vvig-m", m);
+      wall.style.setProperty("--vvig-m2", Math.min(d, m + 1));
+      wall.style.setProperty("--vvig-t", Math.max(m + 1, Math.min(d, d - 2)));
+      wall.style.setProperty("--vvig-l", Math.max(m + 1, Math.min(d, d - 1)));
       // 官網上方已有 FOLLOW US 圖，牆本身不再放標題列
       var grid = el("div", "vvig-grid");
       var maxD = c.d * c.r, maxM = c.m * c.mr;
