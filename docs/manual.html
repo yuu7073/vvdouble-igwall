@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>VV DOUBLE · IG 內容牆 操作說明書</title>
+<style>
+@page{size:A4;margin:18mm 16mm 18mm 16mm}
+*{box-sizing:border-box}
+body{font-family:"Noto Sans CJK TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1F2430;font-size:11pt;line-height:1.75;margin:0}
+h1{font-size:24pt;margin:0 0 4px;letter-spacing:1px}
+.sub{color:#5A6170;font-size:10.5pt;margin:0 0 28px}
+h2{font-size:15pt;margin:26px 0 10px;padding:6px 0 6px 12px;border-left:5px solid #4472C4;background:#EEF2F9;page-break-after:avoid}
+h3{font-size:12pt;margin:16px 0 6px;color:#33415C;page-break-after:avoid}
+p{margin:4px 0}
+ol,ul{margin:4px 0 8px;padding-left:22px}
+li{margin:3px 0}
+b{color:#1F2430}
+.key{display:inline-block;background:#1F2430;color:#fff;font-size:9.5pt;padding:0 7px;border-radius:4px;margin:0 2px;line-height:1.6}
+.btn{display:inline-block;border:1px solid #B9BFCB;background:#fff;font-size:9.5pt;padding:0 8px;border-radius:4px;margin:0 2px;line-height:1.6}
+.note{border:1px solid #F3AB55;background:#FFF7EC;padding:8px 12px;border-radius:6px;margin:8px 0;font-size:10.5pt}
+.warn{border:1px solid #D9534F;background:#FDF0EF;padding:8px 12px;border-radius:6px;margin:8px 0;font-size:10.5pt}
+table{border-collapse:collapse;width:100%;margin:8px 0 10px;font-size:10pt}
+th,td{border:1px solid #D4D7DE;padding:6px 9px;text-align:left;vertical-align:top}
+th{background:#DEE5F2;color:#33415C;font-weight:600}
+.toc{columns:2;column-gap:28px;font-size:10.5pt;margin:0 0 6px}
+.toc div{break-inside:avoid;padding:2px 0}
+.url{font-family:Consolas,monospace;font-size:10pt;background:#F3F4F7;padding:1px 6px;border-radius:3px}
+.pb{page-break-before:always}
+.small{color:#5A6170;font-size:9.5pt}
+</style></head><body>
+
+<h1>VV DOUBLE · IG 內容牆 操作說明書</h1>
+<p class="sub">官網首頁 IG 牆、浮動影片、商品頁影片、成效 · 2026/11 版</p>
+
+<h2>目錄</h2>
+<div class="toc">
+<div>1. 這個工具在做什麼</div>
+<div>2. 登入與上方工具列</div>
+<div>3. 首頁牆</div>
+<div>4. 浮動影片</div>
+<div>5. 商品頁影片</div>
+<div>6. 成效</div>
+<div>7. 自動更新機制</div>
+<div>8. 常見問題</div>
+</div>
+
+<h2>1. 這個工具在做什麼</h2>
+<p>這是 VV DOUBLE 自己開發的工具，取代原本的 Tagnology 外掛。把 Instagram <b>@vvdoubleofficial</b> 的貼文放到官網 vvdouble.com 上，分成三個區塊：</p>
+<table>
+<tr><th style="width:22%">區塊</th><th>出現位置</th><th style="width:34%">內容</th></tr>
+<tr><td><b>首頁牆</b></td><td>官網首頁最下方（FOLLOW US 圖的下面）</td><td>自選的 IG 貼文格子牆，桌機 7 欄 × 3 列、手機 3 欄 × 4 列（可調）</td></tr>
+<tr><td><b>浮動影片</b></td><td>全站右下角（或左下角）的小視窗</td><td>一支 Reels，點開可看完整影片與文案</td></tr>
+<tr><td><b>商品頁影片</b></td><td>各商品頁「加入購物車」下方（可改位置）</td><td>每款商品最多 3 支 IG 貼文／影片，依商品個別設定</td></tr>
+</table>
+<p>顧客點任一格會跳出視窗，裡面有圖片／影片、文案，以及「前往 Instagram」按鈕。</p>
+
+<h2>2. 登入與上方工具列</h2>
+<ol>
+<li>開啟後台網址：<span class="url">https://yuu7073.github.io/vvdouble-igwall/</span></li>
+<li>右上角輸入<b>密碼</b>（與 FB 貼文工具同一組）後按 <span class="key">Enter</span>。密碼只存在這個分頁，關掉分頁要重新輸入。</li>
+<li>登入後上方有四個分頁：<span class="btn">首頁牆</span><span class="btn">浮動影片</span><span class="btn">商品頁</span><span class="btn">成效</span>。</li>
+</ol>
+<p>工具列右側：</p>
+<ul>
+<li><span class="btn">預覽官網</span>：開啟官網快照預覽頁，可切換首頁／商品頁、桌機／手機，看目前已發布的效果。</li>
+<li><span class="btn">立即同步</span>：馬上去 Instagram 抓最新貼文（系統每小時也會自動抓，剛發新貼文想立刻用才需要按）。</li>
+</ul>
+<div class="note"><b>發布觀念：</b>每個分頁的設定改完後都要按右下角 <span class="key">發布到官網</span> 才會生效。還沒發布時，區塊標題右邊會顯示「有變更未發布」。</div>
+
+<h2 class="pb">3. 首頁牆</h2>
+<p>左邊是<b>官網顯示中</b>（牆上目前有哪些格子），右邊是<b>IG 貼文</b>（貼文庫）。</p>
+<h3>加入／移除貼文</h3>
+<ol>
+<li>右邊貼文庫點一下縮圖 → 加到牆的最後一格。</li>
+<li>左邊牆上縮圖右下角的 <span class="btn">×</span> → 從牆上移除（不會刪 IG 貼文）。</li>
+<li>右邊篩選：<span class="btn">全部</span><span class="btn">影片</span><span class="btn">多圖</span><span class="btn">顧客標記</span><span class="btn">未使用</span>。「顧客標記」是顧客在 IG 標記 @vvdoubleofficial 的貼文（UGC）；「未使用」是還沒放到牆上的。</li>
+<li>往下捲可按 <span class="btn">載入更多</span>。</li>
+</ol>
+<h3>調整順序</h3>
+<ul>
+<li><b>拖曳</b>：左邊牆上縮圖可直接拖到想要的位置。</li>
+<li><b>釘選</b>：滑鼠移到縮圖，左下角出現圖釘，點一下變黑色＝釘選。釘選的格子在「照時間排序」時會固定在原位置不動（例如固定第一格放活動貼文）。</li>
+<li><span class="btn">照時間排序</span>：沒釘選的格子依 IG 發文時間由新到舊重排，釘選的留在原位。</li>
+</ul>
+<h3>欄列設定</h3>
+<p>下方 <b>桌機 欄／列</b> 與 <b>手機 欄／列</b> 用 <span class="btn">−</span><span class="btn">+</span> 調整。牆上實際顯示的格數＝欄 × 列，多放的貼文不會顯示；建議放的數量剛好等於桌機欄 × 列。每格比例固定 4:5（直式）。</p>
+<p>牆會依螢幕寬度自動調整欄數（以桌機 7 欄、手機 3 欄為例）：手機 3 欄 → 大手機 4 欄 → 平板 5 欄 → 小筆電 6 欄 → 桌機 7 欄，格子間距也會跟著縮小，不用另外設定。</p>
+<h3>發布</h3>
+<p>按 <span class="key">發布到官網</span>，約 10 秒內官網生效。瀏覽器若還看到舊的，按 <span class="key">Ctrl + Shift + R</span> 強制重新整理。</p>
+
+<h2>4. 浮動影片</h2>
+<ol>
+<li>右邊 <b>IG 影片</b> 只列 Reels，點一下就換成那支（左邊「目前顯示」會更新）。</li>
+<li>左邊設定：
+<table>
+<tr><th style="width:24%">項目</th><th>說明</th></tr>
+<tr><td>顯示</td><td>開關。關掉＝官網不出現浮窗。</td></tr>
+<tr><td>位置</td><td>左下／右下。</td></tr>
+<tr><td>大小</td><td>小／中／大。</td></tr>
+<tr><td>自動播放</td><td>開＝浮窗內影片靜音自動循環播放；關＝顯示封面圖，點了才播。</td></tr>
+<tr><td>顯示頁面</td><td>全站／只有首頁。</td></tr>
+</table></li>
+<li>按 <span class="key">發布到官網</span>。</li>
+</ol>
+<p class="small">顧客按浮窗右上角 × 關閉後，同一次瀏覽（關閉分頁前）不會再出現。若某商品頁有設定「右下浮窗」位置的商品影片，該頁會改顯示商品影片。</p>
+
+<h2 class="pb">5. 商品頁影片</h2>
+<p>依商品逐一設定，每款最多 3 支。</p>
+<ol>
+<li>左邊搜尋框輸入<b>品名或貨號</b>（可只打前幾碼），列表點選商品。篩選 <span class="btn">已設定</span> 可只看已經放影片的商品。</li>
+<li>右邊上方顯示商品名稱、<span class="btn">開啟商品頁</span> 連結與狀態（未設定／已發布／有變更未發布）。</li>
+<li><b>位置</b>：<span class="btn">加入購物車下方</span>（預設）／<span class="btn">商品說明上方</span>／<span class="btn">右下浮窗</span>。</li>
+<li><b>同色款</b>：<span class="btn">一起套用</span>＝同一貨號不同顏色的商品一起設定（預設）；<span class="btn">只有這款</span>＝只設這一個。</li>
+<li>下方 <b>IG 貼文</b> 點一下加入，最多 3 支，「商品頁顯示中」會列出已選的；點已選的縮圖 × 可移除。篩選：
+<ul>
+<li><span class="btn">建議</span>：文案裡有這款貨號或品名的貼文（系統自動比對），通常這裡就能找到。</li>
+<li><span class="btn">影片</span>／<span class="btn">顧客標記</span>／<span class="btn">全部</span>。</li>
+</ul></li>
+<li>按 <span class="key">發布到官網</span>。要整個拿掉按 <span class="btn">移除商品頁影片</span> 再發布。</li>
+</ol>
+<div class="note">商品頁沒有設定影片的商品，不會顯示任何區塊，不影響原本版面。</div>
+
+<h2>6. 成效</h2>
+<p>上方可切 <span class="btn">7 天</span><span class="btn">30 天</span><span class="btn">90 天</span>，以及區塊篩選 <span class="btn">全部</span><span class="btn">首頁牆</span><span class="btn">浮窗</span><span class="btn">商品頁</span>。</p>
+<table>
+<tr><th style="width:22%">指標</th><th>定義</th></tr>
+<tr><td>曝光</td><td>格子／浮窗實際出現在顧客螢幕上的次數（捲到看得到才算）。</td></tr>
+<tr><td>點開</td><td>顧客點格子或浮窗打開貼文視窗的次數。</td></tr>
+<tr><td>點開率</td><td>點開 ÷ 曝光。</td></tr>
+<tr><td>播放</td><td>影片開始播放的次數。</td></tr>
+<tr><td>點 IG</td><td>在貼文視窗按「前往 Instagram」的次數。</td></tr>
+<tr><td>平均停留</td><td>貼文視窗打開到關閉的平均秒數。</td></tr>
+</table>
+<ul>
+<li><b>每日</b>：長條圖，每天的曝光與點開。</li>
+<li><b>各區塊</b>：首頁牆／浮窗／商品頁各自的曝光、點開、播放、平均停留。</li>
+<li><b>貼文點開 Top 10</b>：最常被點開的貼文卡片，適合用來挑浮窗與商品頁影片。</li>
+<li><b>商品頁</b>：每個有設定影片的商品的成效。</li>
+<li><b>各貼文</b>：全部貼文的明細表。</li>
+</ul>
+<p><span class="btn">清空成效資料</span>（右上）會把全部統計歸零，無法復原，只在測試後或要重新起算時使用。</p>
+<p class="small">成效另外也會送進 GA4 的 dataLayer（事件 ig_wall_view / ig_wall_open / ig_wall_play / ig_wall_link），不影響廣告追蹤碼。</p>
+
+<h2 class="pb">7. 自動更新機制</h2>
+<ul>
+<li>系統<b>每小時</b>自動從 Instagram 抓最新貼文與顧客標記貼文，並更新官網上的圖片連結（IG 圖片網址會過期，不更新會變空白）。這部分不用人工操作。</li>
+<li>新貼文<b>不會自動</b>放上首頁牆，要到後台加入後發布；若想讓牆固定顯示最新貼文，加入後按「照時間排序」再發布即可。</li>
+<li>IG 上刪除的貼文，下次同步後會從貼文庫消失；若它還在牆上，請手動移除後重新發布。</li>
+</ul>
+
+<h2>8. 常見問題</h2>
+<table>
+<tr><th style="width:34%">狀況</th><th>處理</th></tr>
+<tr><td>發布了但官網看起來沒變</td><td>瀏覽器快取。按 <span class="key">Ctrl + Shift + R</span>，或開無痕視窗看。</td></tr>
+<tr><td>右上角顯示「密碼錯誤」</td><td>重新輸入密碼後按 Enter；密碼與 FB 貼文工具相同。</td></tr>
+<tr><td>貼文庫沒有剛發的貼文</td><td>按 <span class="btn">立即同步</span>，約 10 秒後重新整理。</td></tr>
+<tr><td>牆上某格變空白</td><td>通常是 IG 圖片網址過期，等下一個整點自動更新，或按「立即同步」後再按一次「發布到官網」。</td></tr>
+<tr><td>商品頁搜不到商品</td><td>只搜官網上架中的商品；試打貨號前幾碼或品名關鍵字。</td></tr>
+<tr><td>「建議」篩選是空的</td><td>表示沒有貼文文案提到這款貨號／品名，改用「影片」或「全部」自己挑。</td></tr>
+<tr><td>顧客標記篩選是空的</td><td>近期沒有顧客標記 @vvdoubleofficial 的貼文；只抓標記貼文，不抓 hashtag。</td></tr>
+<tr><td>想暫時全部關掉</td><td>首頁牆：把格子全部移除後發布。浮窗：「顯示」關掉後發布。商品頁：逐一「移除商品頁影片」。</td></tr>
+</table>
+<p class="small" style="margin-top:24px">後台：yuu7073.github.io/vvdouble-igwall · 官網：vvdouble.com · 有問題找 Vivian</p>
+</body></html>
