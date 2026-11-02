@@ -51,12 +51,9 @@
   // ---------- 樣式 ----------
   var css = "" +
     ".vvig-wall{margin:0 auto;padding:0 0 8px;font-family:inherit;color:#1F2430}" +
-    ".vvig-head{display:flex;align-items:baseline;gap:12px;margin:0 0 16px}" +
-    ".vvig-title{font-size:20px;font-weight:700;letter-spacing:1px;margin:0}" +
-    ".vvig-handle{font-size:13px;color:#5A6170;text-decoration:none}" +
-    ".vvig-grid{display:grid;gap:6px;grid-template-columns:repeat(var(--vvig-m),minmax(0,1fr))}" +
+        ".vvig-grid{display:grid;gap:6px;grid-template-columns:repeat(var(--vvig-m),minmax(0,1fr))}" +
     "@media(min-width:768px){.vvig-grid{grid-template-columns:repeat(var(--vvig-d),minmax(0,1fr))}}" +
-    ".vvig-it{position:relative;aspect-ratio:1;overflow:hidden;background:#EEE;border:0;padding:0;cursor:pointer;display:block;width:100%}" +
+    ".vvig-it{position:relative;aspect-ratio:4/5;overflow:hidden;background:#EEE;border:0;padding:0;cursor:pointer;display:block;width:100%}" +
     ".vvig-it img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}" +
     ".vvig-it:hover img{transform:scale(1.04)}" +
     ".vvig-badge{position:absolute;right:8px;top:8px;width:24px;height:24px;border-radius:12px;background:rgba(31,36,48,.7);display:flex;align-items:center;justify-content:center}" +
@@ -165,12 +162,7 @@
       var c = h.cols || { d: 6, r: 3, m: 3, mr: 4 };
       var wall = el("div", "vvig-wall");
       wall.style.setProperty("--vvig-d", c.d); wall.style.setProperty("--vvig-m", c.m);
-      if (h.title) {
-        var head = el("div", "vvig-head");
-        head.appendChild(el("h2", "vvig-title", esc(h.title)));
-        if (h.handle) { var a = el("a", "vvig-handle", "@" + esc(h.handle)); a.href = "https://www.instagram.com/" + encodeURIComponent(h.handle) + "/"; a.target = "_blank"; a.rel = "noopener"; head.appendChild(a); }
-        wall.appendChild(head);
-      }
+      // 官網上方已有 FOLLOW US 圖，牆本身不再放標題列
       var grid = el("div", "vvig-grid");
       var maxD = c.d * c.r, maxM = c.m * c.mr;
       h.items.slice(0, Math.max(maxD, maxM)).forEach(function (m, i) {
