@@ -206,7 +206,7 @@ td img{width:40px;height:40px;border-radius:4px;object-fit:cover;display:block;b
 
 <!-- 成效 -->
 <div class="wrap hide" id="tab-stats">
-  <div class="c12" style="display:flex;align-items:center;gap:12px"><span class="seg" id="statRange"><button data-v="7">7 天</button><button data-v="30" class="s">30 天</button><button data-v="90">90 天</button></span><span class="chips" id="statCtx"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="home">首頁牆</button><button class="chip" data-f="float">浮窗</button><button class="chip" data-f="product">商品頁</button></span></div>
+  <div class="c12" style="display:flex;align-items:center;gap:12px"><span class="seg" id="statRange"><button data-v="7">7 天</button><button data-v="30" class="s">30 天</button><button data-v="90">90 天</button></span><span class="chips" id="statCtx"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="home">首頁牆</button><button class="chip" data-f="float">浮窗</button><button class="chip" data-f="product">商品頁</button></span><span class="end"><button class="btn sm" id="statReset">清空成效資料</button></span></div>
   <div class="c12 kpis" id="kpis"></div>
   <div class="card c7"><div class="h"><b>每日</b><span class="sub">曝光與點開</span><span class="end" id="chartLegend"></span></div><div id="chart"></div></div>
   <div class="card c5"><div class="h"><b>各區塊</b></div>
@@ -489,6 +489,12 @@ async function loadStats(){
   try { S.stats = await api('stats'); } catch (e) { $('#kpis').innerHTML = '<div class="msg err">' + esc(e.message) + '</div>'; return; }
   paintStats();
 }
+$('#statReset').addEventListener('click', async function(){
+  if (!confirm('確定清空全部成效資料？清掉後無法復原。')) return;
+  var b = this; b.disabled = true;
+  try { await api('resetStats'); await loadStats(); } catch (e) { alert(e.message); }
+  b.disabled = false;
+});
 function dayKey(ts){ return new Date(ts + 8 * 3600e3).toISOString().slice(0, 10); }
 function pct(a, b){ return b ? (100 * a / b).toFixed(1) + '%' : '—'; }
 function paintStats(){
